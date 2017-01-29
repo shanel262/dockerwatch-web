@@ -6,12 +6,16 @@ dockerWatch.config(['$routeProvider',
 		.when('/', {
 			templateUrl: 'partials/home.html'
 		})
+		.when('/projects', {
+			templateUrl: 'partials/projects.html'
+		})
 		.otherwise({
 			redirectTo: "/"
 		})
 	}
 ])
 
+//Home
 dockerWatch.controller('HomeController', ["$scope", "HomeService", "$route", "$timeout", function($scope, HomeService, $route, $timeout){
 	var containerId = "098"
 	var mostRecentTime = 0
@@ -48,6 +52,36 @@ dockerWatch.factory('HomeService', ["$location", "$http", function($location, $h
 					return v.data
 				})
 				return stats
+			})
+		}
+	}
+}])
+
+
+//Projects
+dockerWatch.controller('ProjectsController', ["$scope", "ProjectsService", "$timeout", function($scope, ProjectsService, $timeout){
+	$scope.projects = []
+	function getProjects(){
+		ProjectsService.getProjects().then(function(res){
+			var projects = res.values[0][1].split(';')
+			$timeout(function(){
+				$scope.projects = projects
+				console.log('UPDATING PROJECTS:', projects)
+			}, 0)
+		})		
+	}
+	getProjects()
+}])
+
+dockerWatch.factory('ProjectsService', ["$http", function($http){
+	return {
+		getProjects: function(){
+			return $http.get('api/projects/getProjects/')
+			.then(function(response){
+				var projects = Promise.resolve(response).then(function(v){
+					return v.data
+				})
+				return projects
 			})
 		}
 	}

@@ -1,0 +1,23 @@
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-6" ng-controller="HomeController">
+			<div class="panel panel-primary">
+				<div class="panel-heading"><b>Container ID: {{name}}</b></div>
+				<div class="panel-body">
+					<p>Date: <b>{{date}}</b>   Time: <b>{{time}}</b></p>
+					<div class="panel panel-success">
+						<div class="panel-heading">CPU</div>
+						<div class="panel-body">
+							<b>{{cpu}}%</b>
+						</div>
+					</div>
+					<div class="panel panel-warning">
+					<div class="panel-heading">Memory</div>
+						<div class="panel-body">
+							<b>{{mem}}%</b>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>

@@ -1,0 +1,22 @@
+{
+  "name": "dockerwatch-web",
+  "version": "1.0.0",
+  "description": "Web UI for DockerWatch and it also interacts with InfluxDB.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "author": "Shane Lacey",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "1.0.x",
+    "cookie-parser": "1.0.x",
+    "debug": "0.7.x",
+    "errorhandler": "1.0.x",
+    "express": "4.0.x",
+    "influx": "5.0.x",
+    "lodash": "2.4.x",
+    "morgan": "1.0.x"
+  }
+}

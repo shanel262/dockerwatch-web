@@ -9,6 +9,9 @@ dockerWatch.config(['$routeProvider',
 		.when('/projects', {
 			templateUrl: 'partials/projects.html'
 		})
+		.when('/new-project', {
+			templateUrl: 'partials/newProject.html'
+		})
 		.otherwise({
 			redirectTo: "/"
 		})
@@ -58,18 +61,32 @@ dockerWatch.factory('HomeService', ["$location", "$http", function($location, $h
 }])
 
 //Projects
-dockerWatch.controller('ProjectsController', ["$scope", "ProjectsService", "$timeout", function($scope, ProjectsService, $timeout){
+dockerWatch.controller('ProjectsController', ["$scope", "ProjectsService", "$timeout", "$location", function($scope, ProjectsService, $timeout, $location){
 	$scope.projects = []
 	function getProjects(){
 		ProjectsService.getProjects().then(function(res){
-			var projects = res.values[0][1].split(';')
-			$timeout(function(){
+			var projects = []
+			for (projectIndex in res.values){
+				var containers = res.values[projectIndex][1].split(';')
+				var project = {
+					id: res.values[projectIndex][2],
+					name: res.values[projectIndex][3],
+					owner: res.values[projectIndex][4],
+					containers: containers
+				}
+				projects.push(project)
+			}
+			$timeout(function(){ //Temporary fix to a unusual problem (Journal 29/01/17)
 				$scope.projects = projects
 				console.log('UPDATING PROJECTS:', projects)
 			}, 0)
 		})		
 	}
 	getProjects()
+	$scope.newProject = function(){
+		$location.path('/new-project')
+		console.log('Going to new project')
+	}
 }])
 
 dockerWatch.factory('ProjectsService', ["$http", function($http){
@@ -84,4 +101,18 @@ dockerWatch.factory('ProjectsService', ["$http", function($http){
 			})
 		}
 	}
+}])
+
+
+//New Projects
+dockerWatch.controller('NewProjectsController', ["$scope", "NewProjectsService", "$location", function($scope, NewProjectsService, $location){
+	$scope.addNewProject = function(){
+		console.log('Button pressed:', $scope.textField)
+	}
+}])
+
+dockerWatch.factory('NewProjectsService', ["$http", function($http){
+	// return {
+		
+	// }
 }])

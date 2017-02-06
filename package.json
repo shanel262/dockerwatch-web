@@ -17,6 +17,7 @@
     "express": "4.0.x",
     "influx": "5.0.x",
     "lodash": "2.4.x",
-    "morgan": "1.0.x"
+    "morgan": "1.0.x",
+    "uuid": "3.0.1"
   }
 }

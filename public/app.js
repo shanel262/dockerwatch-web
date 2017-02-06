@@ -69,7 +69,7 @@ dockerWatch.controller('ProjectsController', ["$scope", "ProjectsService", "$tim
 			for (projectIndex in res.values){
 				var containers = res.values[projectIndex][1].split(';')
 				var project = {
-					id: res.values[projectIndex][2],
+					id: res.values[projectIndex][5],
 					name: res.values[projectIndex][3],
 					owner: res.values[projectIndex][4],
 					containers: containers
@@ -85,7 +85,6 @@ dockerWatch.controller('ProjectsController', ["$scope", "ProjectsService", "$tim
 	getProjects()
 	$scope.newProject = function(){
 		$location.path('/new-project')
-		console.log('Going to new project')
 	}
 }])
 
@@ -107,12 +106,24 @@ dockerWatch.factory('ProjectsService', ["$http", function($http){
 //New Projects
 dockerWatch.controller('NewProjectsController', ["$scope", "NewProjectsService", "$location", function($scope, NewProjectsService, $location){
 	$scope.addNewProject = function(){
-		console.log('Button pressed:', $scope.textField)
+		var project = {
+			name: $scope.name,
+			conIds: $scope.conIds
+		}
+		createProject(project)
+		$scope.name = ""
+		$scope.conIds = ""
+		$location.path('/projects')
 	}
 }])
 
 dockerWatch.factory('NewProjectsService', ["$http", function($http){
+	createProject = function(project){
+		$http.post('api/projects/newProject/', project).then(function(res){
+			console.log('RETURNED:', res)
+		})
+	}
 	// return {
-		
+
 	// }
 }])

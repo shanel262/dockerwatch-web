@@ -1,4 +1,5 @@
 var influxdb = require('influx').InfluxDB
+var uuid = require('uuid/v4')
 
 var HOST = '127.0.0.1'
 var PORT = 8001
@@ -18,4 +19,13 @@ exports.getProjects = function(req, res){
 			return res.send(200, v.results[0].series[0])
 		})
 	})
+}
+
+exports.newProject = function(req, res){
+	var id = uuid()
+	influx.writeMeasurement('projects', [
+		{
+			fields: {uuid: id.toString(), name: req.body.name, containers: req.body.conIds, owner: 'shanel262'}
+		}
+	])
 }

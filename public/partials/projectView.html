@@ -1,18 +1,25 @@
-<div class="container-fluid" ng-controller="ProjectsController">
+<div class="container-fluid" ng-controller="SingleProjectController">
 	<div class="row">
 		<div class="col-md-4">
 			<div class="panel panel-primary">
-				<div class="panel-heading"><b>Projects</b>
-				<button ng-click="newProject()" class="btn btn-success btn-md">New Project</button>
+				<div class="panel-heading">
+					<b>Project ID: {{id}}</b>
+					<a href="#/edit-project/{{id}}" class="btn btn-success btn-md">Edit</a>
 				</div>
 				<div class="panel-body">
-					<div class="panel panel-success" ng-repeat="project in projects">
-						<div class="panel-heading"><a href="#/project/{{project.id}}">Project ID: {{project.id}}</a></div>
+					Name: <b>{{name}}</b><br>
+					Created by: <b>{{owner}}</b><br>
+					Created on: <b>{{time}} - {{date}}</b>
+				</div>
+			</div>
+			<div class="panel panel-primary">
+				<div class="panel-heading"><b>Containers</b></div>
+				<div class="panel-body">
+					<div class="panel panel-success" ng-repeat="container in containers">
+						<div class="panel-heading">Container ID: {{container}}</div>
 						<div class="panel-body">
 							<ul>
-								<li>Name: {{project.name}}</li>
-								<li>Owner: {{project.owner}}</li>
-								<li>Container IDs: {{project.containers}}</li>
+								<li>Stats</li>
 							</ul>
 						</div>
 					</div>

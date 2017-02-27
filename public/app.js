@@ -71,13 +71,14 @@ dockerWatch.controller('ProjectsController', ["$scope", "ProjectsService", "$tim
 	$scope.projects = []
 	function getProjects(){
 		ProjectsService.getProjects().then(function(res){
+			console.log('RES:', res.data[0].containers)
 			var projects = []
-			for (projectIndex in res.values){
-				var containers = res.values[projectIndex][1].split(';')
+			for (projectIndex in res.data){
+				var containers = res.data[projectIndex].containers.split(';')
 				var project = {
-					id: res.values[projectIndex][5],
-					name: res.values[projectIndex][3],
-					owner: res.values[projectIndex][4],
+					id: res.data[projectIndex]._id,
+					name: res.data[projectIndex].name,
+					owner: res.data[projectIndex].owner,
 					containers: containers
 				}
 				projects.push(project)
@@ -99,10 +100,8 @@ dockerWatch.factory('ProjectsService', ["$http", function($http){
 		getProjects: function(){
 			return $http.get('api/projects/getProjects/')
 			.then(function(response){
-				var projects = Promise.resolve(response).then(function(v){
-					return v.data
-				})
-				return projects
+				console.log('RESPONSE:', response)
+				return response
 			})
 		}
 	}
@@ -139,15 +138,15 @@ dockerWatch.controller('SingleProjectController', ["$scope", "SingleProjectServi
 	console.log('ID:', $routeParams.projectID)
 	$http.get('/api/projects/' + $routeParams.projectID).then(function(project){
 		console.log('RESPONSE1:', project.data)
-		$scope.timeNs = project.data.values[0][0]
-		var time = project.data.timeUtc
-		$scope.date = time.substring(0, 10)
-		$scope.time = time.substring(11, 19)
-		$scope.name = project.data.values[0][3]
-		$scope.owner = project.data.values[0][4]
-		$scope.id = project.data.values[0][5]
-		$scope.containers = project.data.values[0][1].split(';')
-		$scope.containerString = project.data.values[0][1]
+		var utcTime = project.data.time
+		$scope.utcTime = utcTime
+		$scope.date = utcTime.substring(0, 10)
+		$scope.time = utcTime.substring(11, 19)
+		$scope.name = project.data.name
+		$scope.owner = project.data.owner
+		$scope.id = project.data._id
+		$scope.containers = project.data.containers.split(';')
+		$scope.containerString = project.data.containers
 	})
 
 	$scope.saveProject = function(){
@@ -156,19 +155,34 @@ dockerWatch.controller('SingleProjectController', ["$scope", "SingleProjectServi
 			id: $scope.id,
 			name: $scope.name,
 			owner: $scope.owner,
-			conIds: $scope.conIds,
-			time: $scope.timeNs
+			conIds: $scope.containerString,
+			time: $scope.utcTime
 		}
-		console.log('NEWINFO:', newInfo)
 		save(newInfo)
+		$location.path('/project/' + $scope.id)
+	}
+
+	$scope.deleteProject = function(){
+		console.log('DELETE')
+		var info = {
+			id: $scope.id
+		}
+		deleteProject(info)
+		$location.path('/projects')
 	}
 }])
 
 dockerWatch.factory('SingleProjectService', ["$http", function($http){
 	save = function(newInfo){
-		console.log('NEWINFO2:', newInfo)
 		$http.post('/api/projects/editProject', newInfo).then(function(res){
-			console.log('RETURNED EDIT:', res)
+			console.log('RESPONSE:', res)
+		})
+	}
+
+	deleteProject = function(info){
+		console.log('PROJECTID:', info.id)
+		$http.delete('/api/projects/deleteProject/' + info.id).then(function(res){
+			console.log('RESPONSE:', res)
 		})
 	}
 	// return {

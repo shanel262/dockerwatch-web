@@ -1,56 +1,62 @@
-var influxdb = require('influx').InfluxDB
 var uuid = require('uuid/v4')
 var moment = require('moment')
+var Project = require('./projects.model')
+var project = new Project()
 
-var HOST = '127.0.0.1'
-var PORT = 8001
-
-var influx = new influxdb({
-		host: 'localhost',
-		port: 8086,
-		username: 'root',
-		password: 'root',
-		database: 'test'
-	})
+function handleError(err) {
+  console.log(err);
+  return res.send(500, err);
+}
 
 exports.getProjects = function(req, res){
-	var query = 'select * from projects'
-	influx.queryRaw([query]).then(results => {
-		var stats = Promise.resolve(results).then(function(v){
-			console.log('V:', v.results[0].series[0])
-			return res.send(200, v.results[0].series[0])
-		})
+	Project.find({}, function(err, projects){
+		if(err){return handleError(err)}
+		return res.json(200, projects)
 	})
 }
 
 exports.newProject = function(req, res){
-	var id = uuid()
-	influx.writeMeasurement('projects', [
-		{
-			fields: {uuid: id.toString(), name: req.body.name, containers: req.body.conIds, owner: 'shanel262'}
-		}
-	])
+	var project = {
+		name: req.body.name,
+		containers: req.body.conIds,
+		owner: 'shanel262'
+	}
+	Project.create(project, function(err, response){
+		if(err){return handleError(err)}
+		console.log('Project created:', response)
+		return res.json(201, response)
+	})
 }
 
 exports.getSingleProject = function(req, res){
-	var query = "select * from projects where \"uuid\"='" + req.params.id + "'"
-	influx.queryRaw([query], {precision:'ns'}).then(results => {
-		var project = Promise.resolve(results).then(function(projectRes){
-			console.log('RESULT::', projectRes.results[0].series[0])
-			var utcTime = projectRes.results[0].series[0].values[0][0]/1000000
-			projectRes.results[0].series[0].timeUtc = moment.utc(utcTime)
-			return res.send(200, projectRes.results[0].series[0])
-		})
+	Project.findById(req.params.id, function(err, project){
+		if(err){handleError(err)}
+		console.log('Found single project:', project)
+		return res.json(200, project)
 	})
 }
 
 exports.editProject = function(req, res){
-	console.log('REACHED API:', req.body)
-	var newInfo = req.body
-	// influx.writeMeasurement('projects', [
-	// 	{
-	// 		fields: {uuid: newInfo.id, name: newInfo.name, containers: newInfo.conIds, owner: newInfo.owner},
-	// 		timestamp: 012
-	// 	}
-	// ])
+	Project.findById(req.body.id, function(err, project){
+		if(err){handleError(err)}
+		project.name = req.body.name
+		project.containers = req.body.conIds
+		project.save(function(err){
+			console.log('Update successful:', project)
+			return res.json(200, project)
+		})
+	})
+}
+
+exports.deleteProject = function(req, res){
+	console.log('DELETE PROJECT:', req.params.id)
+	Project.findById(req.params.id, function(err, response){
+		if(err){handleError(err)}
+		response.remove()
+		response.save(function(err){
+			if(err){handleError(err)}
+			console.log('Project removed')
+			return res.json(410, response)
+		})
+	})
 }

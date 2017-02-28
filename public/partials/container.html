@@ -1,0 +1,30 @@
+<div class="container-fluid" ng-controller="SingleContainerController">
+	<div class="row">
+		<div class="col-md-4">
+			<div class="panel panel-primary">
+				<div class="panel-heading">
+					<b>Container ID: {{id}}</b>
+				</div>
+				<div class="panel-body">
+					Name: <b>{{name}}</b><br>
+					Created by: <b>{{owner}}</b><br>
+					Created on: <b>{{time}} - {{date}}</b>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-8">
+			<div class="panel panel-primary">
+				<div class="panel-heading"><b>Recently Added</b></div>
+				<div class="panel-body">
+					<div class="panel panel-success" ng-repeat="con in ['098', '2fd']">
+						<div class="panel-heading">Container ID: {{con}}</div>
+						<div class="panel-body">
+							<ul>
+								<li>Some stats</li>
+							</ul>
+						</div>
+					</div>
+				</div>						
+			</div>
+		</div>
+	</div>

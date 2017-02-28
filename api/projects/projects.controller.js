@@ -29,11 +29,18 @@ exports.newProject = function(req, res){
 }
 
 exports.getSingleProject = function(req, res){
-	Project.findById(req.params.id, function(err, project){
-		if(err){handleError(err)}
-		console.log('Found single project:', project)
-		return res.json(200, project)
-	})
+	if(req.params.id && req.params.id.length == 24){
+		Project.findById(req.params.id, function(err, project){
+			if(err){handleError(err)}
+			if(project != null){
+				console.log('Found single project:', err ,project)
+				return res.json(200, project)
+			}
+			else{return res.json(404, "No project found")}
+		})
+	}
+	else{return res.json(400, "Incorrect project ID")}
+	
 }
 
 exports.editProject = function(req, res){
@@ -42,6 +49,7 @@ exports.editProject = function(req, res){
 		project.name = req.body.name
 		project.containers = req.body.conIds
 		project.save(function(err){
+			if(err){handleError(err)}
 			console.log('Update successful:', project)
 			return res.json(200, project)
 		})
@@ -49,14 +57,17 @@ exports.editProject = function(req, res){
 }
 
 exports.deleteProject = function(req, res){
-	console.log('DELETE PROJECT:', req.params.id)
-	Project.findById(req.params.id, function(err, response){
-		if(err){handleError(err)}
-		response.remove()
-		response.save(function(err){
+	if(req.params.id != "undefined"){
+		Project.findById(req.params.id, function(err, response){
 			if(err){handleError(err)}
-			console.log('Project removed')
-			return res.json(410, response)
+			response.remove()
+			response.save(function(err){
+				if(err){handleError(err)}
+				console.log('Project removed')
+				return res.json(410, response)
+			})
 		})
-	})
+	}
+	else{return res.json(400, "No project ID provided")}
+	
 }

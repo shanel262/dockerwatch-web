@@ -71,7 +71,6 @@ dockerWatch.controller('ProjectsController', ["$scope", "ProjectsService", "$tim
 	$scope.projects = []
 	function getProjects(){
 		ProjectsService.getProjects().then(function(res){
-			console.log('RES:', res.data[0].containers)
 			var projects = []
 			for (projectIndex in res.data){
 				var containers = res.data[projectIndex].containers.split(';')
@@ -134,19 +133,23 @@ dockerWatch.factory('NewProjectsService', ["$http", function($http){
 }])
 
 //Single project
-dockerWatch.controller('SingleProjectController', ["$scope", "SingleProjectService", "$routeParams", "$http", "$timeout", "$location", function($scope, SingleProjectService, $routeParams, $http, $timeout, $location){
+dockerWatch.controller('SingleProjectController', ["$scope", "SingleProjectService", "$routeParams", "$http", "$timeout", "$location", "$window", function($scope, SingleProjectService, $routeParams, $http, $timeout, $location, $window){
 	console.log('ID:', $routeParams.projectID)
-	$http.get('/api/projects/' + $routeParams.projectID).then(function(project){
-		console.log('RESPONSE1:', project.data)
-		var utcTime = project.data.time
+	$http.get('/api/projects/' + $routeParams.projectID).success(function(project){
+		console.log('RESPONSE1:', project)
+		var utcTime = project.time
 		$scope.utcTime = utcTime
 		$scope.date = utcTime.substring(0, 10)
 		$scope.time = utcTime.substring(11, 19)
-		$scope.name = project.data.name
-		$scope.owner = project.data.owner
-		$scope.id = project.data._id
-		$scope.containers = project.data.containers.split(';')
-		$scope.containerString = project.data.containers
+		$scope.name = project.name
+		$scope.owner = project.owner
+		$scope.id = project._id
+		$scope.containers = project.containers.split(';')
+		$scope.containerString = project.containers
+	})
+	.error(function(data, status, headers, config){
+		console.log('ERROR:', status, ':' ,data)
+		$location.path('/projects')
 	})
 
 	$scope.saveProject = function(){
@@ -163,12 +166,18 @@ dockerWatch.controller('SingleProjectController', ["$scope", "SingleProjectServi
 	}
 
 	$scope.deleteProject = function(){
-		console.log('DELETE')
 		var info = {
 			id: $scope.id
 		}
-		deleteProject(info)
-		$location.path('/projects')
+		var deleteUser = $window.confirm('Delete project: Are you sure?')
+		if(deleteUser){
+			console.log('Delete project')
+			deleteProject(info)
+			$location.path('/projects')
+		}
+		else{
+			console.log("Don't delete project")
+		}
 	}
 }])
 

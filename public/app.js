@@ -147,6 +147,7 @@ dockerWatch.controller('SingleProjectController', ["$scope", "SingleProjectServi
 	$http.get('/api/projects/' + $routeParams.projectID).success(function(project){
 		console.log('RESPONSE1:', project)
 		var utcTime = dateFromObjectID(project._id)
+		$scope.utcTime = utcTime
 		$scope.date = utcTime.substring(0, 10)
 		$scope.time = utcTime.substring(11, 19)
 		$scope.name = project.name
@@ -187,10 +188,10 @@ dockerWatch.controller('SingleProjectController', ["$scope", "SingleProjectServi
 		var info = {
 			id: $scope.id
 		}
-		var deleteUser = $window.confirm('Delete project: Are you sure?')
-		if(deleteUser){
+		var deleteProject = $window.confirm('Delete project: Are you sure?')
+		if(deleteProject){
 			console.log('Delete project')
-			deleteProject(info)
+			deletePro(info)
 			$location.path('/projects')
 		}
 		else{
@@ -210,7 +211,7 @@ dockerWatch.factory('SingleProjectService', ["$http", function($http){
 		})
 	}
 
-	deleteProject = function(info){
+	deletePro = function(info){
 		console.log('PROJECTID:', info.id)
 		$http.delete('/api/projects/deleteProject/' + info.id).then(function(res){
 			console.log('RESPONSE:', res)
@@ -222,7 +223,7 @@ dockerWatch.factory('SingleProjectService', ["$http", function($http){
 }])
 
 //Home
-dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerService", "$route", "$timeout", "$routeParams", "$http", function($scope, SingleContainerService, $route, $timeout, $routeParams, $http){
+dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerService", "$route", "$timeout", "$routeParams", "$http", "$window", "$location", function($scope, SingleContainerService, $route, $timeout, $routeParams, $http, $window, $location){
 	var split = $routeParams.containerID.split('.')
 	var projectId = split[0]
 	var containerId = split[1]
@@ -252,6 +253,7 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 	$http.get('/api/projects/' + projectId).success(function(project){
 		console.log('RESPONSE1:', project)
 		var utcTime = dateFromObjectID(project._id)
+		$scope.utcTime = utcTime
 		$scope.projectDate = utcTime.substring(0, 10)
 		$scope.projectTime = utcTime.substring(11, 19)
 		$scope.projectName = project.name
@@ -274,7 +276,6 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 	}
 
 	$scope.areSame = function(container, name){
-		console.log('HERE NOW:', container, name)
 		if(container == name){
 			return true
 		}else{
@@ -282,9 +283,43 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 
 		}
 	}
+
+	$scope.deleteContainer = function(){
+		var deleteContainer = $window.confirm('Delete container: Are you sure?')
+		if(deleteContainer){
+			console.log('Delete container')
+			var updatedContainers
+			for (var i = 0; i <= $scope.containers.length - 1; i++) {
+				if($scope.containers[i] == $scope.name){
+					//Do nothing to leave it out of updated containers list
+				}
+				else{
+					updatedContainers.push($scope.containers[i])
+				}
+			}
+			var newInfo = {
+				id: $scope.id,
+				name: $scope.projectName,
+				owner: $scope.owner,
+				conIds: updatedContainers,
+				time: $scope.utcTime
+			}
+			save(newInfo)
+			$location.path('/project/' + $scope.id)
+		}
+		else{
+			console.log("Don't delete container")
+		}
+	}
 }])
 
 dockerWatch.factory('SingleContainerService', ["$location", "$http", function($location, $http){
+	save = function(newInfo){
+		$http.post('/api/projects/editProject', newInfo).then(function(res){
+			console.log('RESPONSE:', res)
+		})
+	}
+
 	return {
 		getStat: function(containerId){
 			return $http.get('api/stats/getStat/' + containerId)

@@ -3,28 +3,47 @@
 		<div class="col-md-4">
 			<div class="panel panel-primary">
 				<div class="panel-heading">
-					<b>Container ID: {{id}}</b>
+					<b>Project ID: {{id}}</b>
 				</div>
 				<div class="panel-body">
-					Name: <b>{{name}}</b><br>
+					Name: <b>{{projectName}}</b><br>
 					Created by: <b>{{owner}}</b><br>
-					Created on: <b>{{time}} - {{date}}</b>
+					Created on: <b>{{projectTime}} - {{projectDate}}</b>
 				</div>
 			</div>
-		</div>
-		<div class="col-md-8">
 			<div class="panel panel-primary">
-				<div class="panel-heading"><b>Recently Added</b></div>
+				<div class="panel-heading"><b>Other Containers</b></div>
 				<div class="panel-body">
-					<div class="panel panel-success" ng-repeat="con in ['098', '2fd']">
-						<div class="panel-heading">Container ID: {{con}}</div>
+					<div class="panel panel-success" ng-repeat="container in containers" ng-hide="areSame(container, name)"> <!--NEVER APPLY A FILTER TO THIS $INDEX WILL CAUSE A BUG-->
+						<div class="panel-heading"><a href="#/container/{{projectContainerConcat[$index]}}">Container ID: {{container}}</a></div>
 						<div class="panel-body">
 							<ul>
-								<li>Some stats</li>
+								<li>Stats</li>
 							</ul>
 						</div>
 					</div>
 				</div>						
 			</div>
 		</div>
+		<div class="col-md-8">
+			<div class="panel panel-primary">
+				<div class="panel-heading"><b>Container ID: {{name}}</b></div>
+				<div class="panel-body">
+					<p>Date: <b>{{date}}</b>   Time: <b>{{time}}</b></p>
+					<div class="panel panel-success">
+						<div class="panel-heading">CPU</div>
+						<div class="panel-body">
+							<b>{{cpu}}%</b>
+						</div>
+					</div>
+					<div class="panel panel-warning">
+					<div class="panel-heading">Memory</div>
+						<div class="panel-body">
+							<b>{{mem}}%</b>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
+</div>

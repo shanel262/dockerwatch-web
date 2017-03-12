@@ -18,6 +18,9 @@ dockerWatch.config(['$routeProvider',
 		.when('/edit-project/:projectID', {
 			templateUrl: 'partials/editProject.html'
 		})
+		.when('/container/:containerID', {
+			templateUrl: 'partials/container.html'
+		})
 		.otherwise({
 			redirectTo: "/"
 		})
@@ -73,7 +76,13 @@ dockerWatch.controller('ProjectsController', ["$scope", "ProjectsService", "$tim
 		ProjectsService.getProjects().then(function(res){
 			var projects = []
 			for (projectIndex in res.data){
-				var containers = res.data[projectIndex].containers.split(';')
+				try{
+					var containers = res.data[projectIndex].containers.split(';')
+				}
+				catch(err){
+					console.log('CANNOT READ CONTAINERS:', err)
+					var containers = []
+				}
 				var project = {
 					id: res.data[projectIndex]._id,
 					name: res.data[projectIndex].name,
@@ -137,14 +146,23 @@ dockerWatch.controller('SingleProjectController', ["$scope", "SingleProjectServi
 	console.log('ID:', $routeParams.projectID)
 	$http.get('/api/projects/' + $routeParams.projectID).success(function(project){
 		console.log('RESPONSE1:', project)
-		var utcTime = project.time
-		$scope.utcTime = utcTime
+		var utcTime = dateFromObjectID(project._id)
 		$scope.date = utcTime.substring(0, 10)
 		$scope.time = utcTime.substring(11, 19)
 		$scope.name = project.name
 		$scope.owner = project.owner
 		$scope.id = project._id
-		$scope.containers = project.containers.split(';')
+		try{
+			$scope.containers = project.containers.split(';')
+		}
+		catch(err){
+			console.log('CANNOT READ CONTAINERS:', err)
+			$scope.containers = []
+		}
+		$scope.projectContainerConcat = []
+		for (var i = 0; i <= $scope.containers.length - 1; i++) {
+			$scope.projectContainerConcat.push(project._id + '.' + $scope.containers[i])
+		}
 		$scope.containerString = project.containers
 	})
 	.error(function(data, status, headers, config){
@@ -179,6 +197,10 @@ dockerWatch.controller('SingleProjectController', ["$scope", "SingleProjectServi
 			console.log("Don't delete project")
 		}
 	}
+
+	function dateFromObjectID(objectId){
+		return new Date(parseInt(objectId.substring(0, 8), 16) * 1000).toISOString()
+	}
 }])
 
 dockerWatch.factory('SingleProjectService', ["$http", function($http){
@@ -197,4 +219,81 @@ dockerWatch.factory('SingleProjectService', ["$http", function($http){
 	// return {
 
 	// }
+}])
+
+//Home
+dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerService", "$route", "$timeout", "$routeParams", "$http", function($scope, SingleContainerService, $route, $timeout, $routeParams, $http){
+	var split = $routeParams.containerID.split('.')
+	var projectId = split[0]
+	var containerId = split[1]
+	var mostRecentTime = 0
+	function getStat(){
+		SingleContainerService.getStat(containerId).then(function(res){
+			if(Date.parse(res.values[0][0]) > mostRecentTime){
+				update(res)
+				mostRecentTime = Date.parse(res.values[0][0])
+			}
+		})		
+	}
+
+	function update(res){
+		$scope.name = res.name
+		var time = res.values[0][0]
+		$scope.date = time.substring(0, 10)
+		$scope.time = time.substring(11, 25)
+		$scope.cpu = res.values[0][1]
+		$scope.mem = res.values[0][2]
+		$timeout(function(){
+			getStat()
+		}, 1000)
+	}
+	getStat()
+
+	$http.get('/api/projects/' + projectId).success(function(project){
+		console.log('RESPONSE1:', project)
+		var utcTime = dateFromObjectID(project._id)
+		$scope.projectDate = utcTime.substring(0, 10)
+		$scope.projectTime = utcTime.substring(11, 19)
+		$scope.projectName = project.name
+		$scope.owner = project.owner
+		$scope.id = project._id
+		$scope.containers = project.containers.split(';')
+		$scope.projectContainerConcat = []
+		for (var i = 0; i <= $scope.containers.length - 1; i++) {
+			$scope.projectContainerConcat.push(project._id + '.' + $scope.containers[i])
+		}
+		$scope.containerString = project.containers
+	})
+	.error(function(data, status, headers, config){
+		console.log('ERROR:', status, ':' ,data)
+		$location.path('/projects')
+	})
+
+	function dateFromObjectID(objectId){
+		return new Date(parseInt(objectId.substring(0, 8), 16) * 1000).toISOString()
+	}
+
+	$scope.areSame = function(container, name){
+		console.log('HERE NOW:', container, name)
+		if(container == name){
+			return true
+		}else{
+			return false
+
+		}
+	}
+}])
+
+dockerWatch.factory('SingleContainerService', ["$location", "$http", function($location, $http){
+	return {
+		getStat: function(containerId){
+			return $http.get('api/stats/getStat/' + containerId)
+			.then(function(response){
+				var stats = Promise.resolve(response).then(function(v){
+					return v.data
+				})
+				return stats
+			})
+		}
+	}
 }])

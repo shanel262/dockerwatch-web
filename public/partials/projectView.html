@@ -16,8 +16,8 @@
 			<div class="panel panel-primary">
 				<div class="panel-heading"><b>Containers</b></div>
 				<div class="panel-body">
-					<div class="panel panel-success" ng-repeat="container in containers">
-						<div class="panel-heading">Container ID: {{container}}</div>
+					<div class="panel panel-success" ng-repeat="container in containers"> <!--NEVER APPLY A FILTER TO THIS $INDEX WILL CAUSE A BUG-->
+						<div class="panel-heading"><a href="#/container/{{projectContainerConcat[$index]}}">Container ID: {{container}}</a></div>
 						<div class="panel-body">
 							<ul>
 								<li>Stats</li>

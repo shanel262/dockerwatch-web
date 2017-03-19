@@ -1,4 +1,4 @@
-var uuid = require('uuid/v4')
+var uuid = require('uuid/v4') //Probably don't need this anymore
 var moment = require('moment')
 var Project = require('./projects.model')
 var project = new Project()
@@ -16,6 +16,8 @@ exports.getProjects = function(req, res){
 }
 
 exports.newProject = function(req, res){
+	req.sanitize('name').escape()
+	req.sanitize('conIds').escape()
 	var project = {
 		name: req.body.name,
 		containers: req.body.conIds,
@@ -44,6 +46,8 @@ exports.getSingleProject = function(req, res){
 }
 
 exports.editProject = function(req, res){
+	req.sanitize('name').escape()
+	req.sanitize('conIds').escape()
 	Project.findById(req.body.id, function(err, project){
 		if(err){handleError(err)}
 		project.name = req.body.name
@@ -63,7 +67,7 @@ exports.deleteProject = function(req, res){
 			response.remove()
 			response.save(function(err){
 				if(err){handleError(err)}
-				console.log('Project removed')
+				console.log('Project removed', req.params.id)
 				return res.json(410, response)
 			})
 		})

@@ -119,6 +119,9 @@ dockerWatch.factory('ProjectsService', ["$http", function($http){
 //New Projects
 dockerWatch.controller('NewProjectsController', ["$scope", "NewProjectsService", "$location", function($scope, NewProjectsService, $location){
 	$scope.addNewProject = function(){
+		if($scope.conIds == ""){
+			$scope.conIds = undefined //If user types in conIds form but leaves it empty, it created an empty string
+		}
 		var project = {
 			name: $scope.name,
 			conIds: $scope.conIds
@@ -143,7 +146,6 @@ dockerWatch.factory('NewProjectsService', ["$http", function($http){
 
 //Single project
 dockerWatch.controller('SingleProjectController', ["$scope", "SingleProjectService", "$routeParams", "$http", "$timeout", "$location", "$window", function($scope, SingleProjectService, $routeParams, $http, $timeout, $location, $window){
-	console.log('ID:', $routeParams.projectID)
 	$http.get('/api/projects/' + $routeParams.projectID).success(function(project){
 		console.log('RESPONSE1:', project)
 		var utcTime = dateFromObjectID(project._id)
@@ -172,7 +174,6 @@ dockerWatch.controller('SingleProjectController', ["$scope", "SingleProjectServi
 	})
 
 	$scope.saveProject = function(){
-		console.log('Button pressed:', $scope.name)
 		var newInfo = {
 			id: $scope.id,
 			name: $scope.name,

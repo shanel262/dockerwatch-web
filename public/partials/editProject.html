@@ -6,9 +6,11 @@
 				<div class="panel-body">
 					<form ng-submit="saveProject()">
 						<div class="form-group">
+							Name: <br>
 							<input type="text" name="name" placeholder="Name" ng-model="name">
 						</div>
 						<div class="form-group">
+							Containers: <br>
 							<input type="text" name="conIds" placeholder="Container IDs split by ;" ng-model="containerString">
 						</div>
 						<button type="submit" class="btn btn-success">Submit</button>

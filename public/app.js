@@ -145,7 +145,7 @@ dockerWatch.factory('NewProjectsService', ["$http", function($http){
 }])
 
 //Single project
-dockerWatch.controller('SingleProjectController', ["$scope", "SingleProjectService", "$routeParams", "$http", "$timeout", "$location", "$window", function($scope, SingleProjectService, $routeParams, $http, $timeout, $location, $window){
+dockerWatch.controller('SingleProjectController', ["$scope", "SingleProjectService", "$routeParams", "$http", "$timeout", "$location", "$window", "$route", function($scope, SingleProjectService, $routeParams, $http, $timeout, $location, $window, $route){
 	$http.get('/api/projects/' + $routeParams.projectID).success(function(project){
 		console.log('RESPONSE1:', project)
 		var utcTime = dateFromObjectID(project._id)
@@ -200,6 +200,52 @@ dockerWatch.controller('SingleProjectController', ["$scope", "SingleProjectServi
 		}
 	}
 
+	$scope.addContainer = function(){
+		console.log('Adding container:', $scope.conId)
+		$scope.status = "Loading..."
+		SingleProjectService.checkContainer($scope.conId).then(function(res){
+			console.log('IMBACK:', res)
+			analyse(res)
+		})
+	}
+
+	function analyse(res){
+		if(res.data.length == 0){
+			console.log('It does not exist in influx')
+			$scope.status = 'Failed, must be created in Influx first'
+		}
+		else if(res.data.length == 1){
+			console.log('It does exist in influx')
+			$scope.status = 'Success'
+			var newConString
+			if($scope.containerString == undefined){
+				newConString = $scope.conId
+			}
+			else{
+				newConString = $scope.containerString + ';' + $scope.conId
+			}
+			var newInfo = {
+				id: $scope.id,
+				name: $scope.name,
+				owner: $scope.owner,
+				conIds: newConString,
+				time: $scope.utcTime
+			}
+			save(newInfo)
+			$timeout(function(){
+				$route.reload()
+			}, 2000)
+		}
+		else{
+			console.log('Unexpected response')
+			$scope.status = "Error"
+		}
+		$scope.conId = ''
+		$timeout(function(){
+		}, 0)
+	}
+
+
 	function dateFromObjectID(objectId){
 		return new Date(parseInt(objectId.substring(0, 8), 16) * 1000).toISOString()
 	}
@@ -218,9 +264,18 @@ dockerWatch.factory('SingleProjectService', ["$http", function($http){
 			console.log('RESPONSE:', res)
 		})
 	}
-	// return {
-
-	// }
+	return {
+		checkContainer: function(containerId){
+			return $http.get('api/stats/checkContainer/' + containerId)
+			.then(function(response){
+				var res = Promise.resolve(response).then(function(v){
+					console.log('V:', v)
+					return v
+				})
+				return res
+			})
+		}
+	}
 }])
 
 //Home

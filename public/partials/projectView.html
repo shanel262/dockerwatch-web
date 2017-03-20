@@ -14,7 +14,9 @@
 				</div>
 			</div>
 			<div class="panel panel-primary">
-				<div class="panel-heading"><b>Containers</b></div>
+				<div class="panel-heading"><b>Containers</b>
+					<button type="button" class="btn btn-success" data-toggle="modal" data-target="#login-modal">Add container</button>
+				</div>
 				<div class="panel-body">
 					<div class="panel panel-success" ng-repeat="container in containers"> <!--NEVER APPLY A FILTER TO THIS $INDEX WILL CAUSE A BUG-->
 						<div class="panel-heading"><a href="#/container/{{projectContainerConcat[$index]}}">Container ID: {{container}}</a></div>
@@ -42,4 +44,23 @@
 				</div>						
 			</div>
 		</div>
+
+		<div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+    	  <div class="modal-dialog">
+				<div class="loginmodal-container">
+					<h1>Add a container</h1><br>
+					<form ng-submit="addContainer()">
+						<input type="text" name="conId" placeholder="Container ID" ng-model="conId">
+						<input type="submit" name="add" class="login loginmodal-submit" value="Add">
+						<!-- <button type="submit" name="add" class="btn btn-info" data-dismiss="modal">Add</button> -->
+					</form>
+					<div class="login-help">
+						Status: {{status}}
+					</div>
+				</div>
+			</div>
+		</div>
+
+
 	</div>
+</div>

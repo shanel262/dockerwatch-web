@@ -372,7 +372,6 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 				conIds: updatedContainers,
 				time: $scope.utcTime
 			}
-			console.log('NEWINFO:', newInfo)
 			save(newInfo)
 			$location.path('/project/' + $scope.id)
 		}

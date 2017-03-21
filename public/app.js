@@ -78,6 +78,9 @@ dockerWatch.controller('ProjectsController', ["$scope", "ProjectsService", "$tim
 			for (projectIndex in res.data){
 				try{
 					var containers = res.data[projectIndex].containers.split(';')
+					if(containers.length == 1 && containers[0] == ""){
+						containers = []
+					}
 				}
 				catch(err){
 					console.log('CANNOT READ CONTAINERS:', err)
@@ -157,6 +160,9 @@ dockerWatch.controller('SingleProjectController', ["$scope", "SingleProjectServi
 		$scope.id = project._id
 		try{
 			$scope.containers = project.containers.split(';')
+			if($scope.containers.length == 1 && $scope.containers[0] == ""){
+				$scope.containers = []
+			}
 		}
 		catch(err){
 			console.log('CANNOT READ CONTAINERS:', err)
@@ -218,7 +224,7 @@ dockerWatch.controller('SingleProjectController', ["$scope", "SingleProjectServi
 			console.log('It does exist in influx')
 			$scope.status = 'success'
 			var newConString
-			if($scope.containerString == undefined){
+			if($scope.containerString == undefined || $scope.containerString == ""){
 				newConString = $scope.conId
 			}
 			else{
@@ -344,13 +350,19 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 		var deleteContainer = $window.confirm('Delete container: Are you sure?')
 		if(deleteContainer){
 			console.log('Delete container')
-			var updatedContainers
+			var updatedContainers = ''
 			for (var i = 0; i <= $scope.containers.length - 1; i++) {
 				if($scope.containers[i] == $scope.name){
 					//Do nothing to leave it out of updated containers list
 				}
 				else{
-					updatedContainers.push($scope.containers[i])
+					// updatedContainers.push($scope.containers[i])
+					if($scope.containers.length <= 2){
+						updatedContainers = $scope.containers[i]
+					}
+					else{
+						updatedContainers = updatedContainers + ';' + $scope.containers[i]
+					}
 				}
 			}
 			var newInfo = {
@@ -360,6 +372,7 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 				conIds: updatedContainers,
 				time: $scope.utcTime
 			}
+			console.log('NEWINFO:', newInfo)
 			save(newInfo)
 			$location.path('/project/' + $scope.id)
 		}

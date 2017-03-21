@@ -1,5 +1,11 @@
 <div class="container-fluid" ng-controller="SingleProjectController">
 	<div class="row">
+		<div class="alert alert-success" ng-model="status" ng-if="status == 'success'">
+  			<strong>Success!</strong> Container was added. Reloading page...
+		</div>
+		<div class="alert alert-danger" ng-model="status" ng-if="status == 'failure'">
+  			<strong>Failure!</strong> Container was not added.
+		</div>
 		<div class="col-md-4">
 			<div class="panel panel-primary">
 				<div class="panel-heading">
@@ -46,21 +52,16 @@
 		</div>
 
 		<div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
-    	  <div class="modal-dialog">
+    		<div class="modal-dialog">
 				<div class="loginmodal-container">
 					<h1>Add a container</h1><br>
 					<form ng-submit="addContainer()">
 						<input type="text" name="conId" placeholder="Container ID" ng-model="conId">
-						<input type="submit" name="add" class="login loginmodal-submit" value="Add">
+						<input type="submit" name="add" class="login loginmodal-submit" value="Add" onclick="$('#login-modal').modal('hide')">
 						<!-- <button type="submit" name="add" class="btn btn-info" data-dismiss="modal">Add</button> -->
 					</form>
-					<div class="login-help">
-						Status: {{status}}
-					</div>
 				</div>
 			</div>
 		</div>
-
-
 	</div>
 </div>

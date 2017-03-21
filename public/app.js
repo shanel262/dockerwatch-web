@@ -212,11 +212,11 @@ dockerWatch.controller('SingleProjectController', ["$scope", "SingleProjectServi
 	function analyse(res){
 		if(res.data.length == 0){
 			console.log('It does not exist in influx')
-			$scope.status = 'Failed, must be created in Influx first'
+			$scope.status = 'failure'
 		}
 		else if(res.data.length == 1){
 			console.log('It does exist in influx')
-			$scope.status = 'Success'
+			$scope.status = 'success'
 			var newConString
 			if($scope.containerString == undefined){
 				newConString = $scope.conId
@@ -234,7 +234,7 @@ dockerWatch.controller('SingleProjectController', ["$scope", "SingleProjectServi
 			save(newInfo)
 			$timeout(function(){
 				$route.reload()
-			}, 2000)
+			}, 4000)
 		}
 		else{
 			console.log('Unexpected response')

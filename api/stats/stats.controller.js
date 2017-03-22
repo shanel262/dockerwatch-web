@@ -24,6 +24,7 @@ exports.getStat = function(req, res){
 }
 
 exports.checkContainer = function(req, res){
+	req.sanitize('containerId').escape()
 	influx.getSeries({measurement: req.params.containerId}).then(series => {
 		return res.send(200, series)
 	})

@@ -1,4 +1,4 @@
-var dockerWatch = angular.module('DockerWatch', ['ngRoute']);
+var dockerWatch = angular.module('DockerWatch', ['ngRoute', 'nvd3']);
 
 dockerWatch.config(['$routeProvider',
 	function($routeProvider){
@@ -47,12 +47,44 @@ dockerWatch.controller('HomeController', ["$scope", "HomeService", "$route", "$t
 		$scope.time = time.substring(11, 25)
 		$scope.cpu = res.values[0][1]
 		$scope.mem = res.values[0][2]
+		$scope.data = [
+			{
+				key: "CPU",
+				y: res.values[0][1]
+			},
+			{
+				key: "Mem",
+				y: res.values[0][2]
+			}
+		]
+		$scope.$apply()
 		console.log('UPDATING STATS', res)
 		$timeout(function(){
 			getStat()
 		}, 1000)
 	}
 	getStat()
+
+	$scope.options = {
+		chart: {
+                type: 'pieChart',
+                height: 500,
+                x: function(d){return d.key;},
+                y: function(d){return d.y;},
+                showLabels: true,
+                duration: 500,
+                labelThreshold: 0.01,
+                labelSunbeamLayout: true,
+                legend: {
+                    margin: {
+                        top: 5,
+                        right: 35,
+                        bottom: 5,
+                        left: 0
+                    }
+                }
+            }
+	};
 }])
 
 dockerWatch.factory('HomeService', ["$location", "$http", function($location, $http){

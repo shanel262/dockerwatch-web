@@ -49,12 +49,12 @@ dockerWatch.controller('HomeController', ["$scope", "HomeService", "$route", "$t
 		$scope.mem = res.values[0][2]
 		$scope.data = [
 			{
-				key: "CPU",
+				key: "Used",
 				y: res.values[0][1]
 			},
 			{
-				key: "Mem",
-				y: res.values[0][2]
+				key: "Free",
+				y: 100 - res.values[0][1]
 			}
 		]
 		$scope.$apply()
@@ -338,11 +338,42 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 		$scope.time = time.substring(11, 25)
 		$scope.cpu = res.values[0][1]
 		$scope.mem = res.values[0][2]
+		$scope.cpuData = [
+			{
+				key: "Used",
+				y: res.values[0][1]
+			},
+			{
+				key: "Free",
+				y: 100 - res.values[0][1]
+			}
+		]
 		$timeout(function(){
 			getStat()
 		}, 1000)
 	}
 	getStat()
+
+	$scope.cpuOptions = {
+		chart: {
+                type: 'pieChart',
+                height: 500,
+                x: function(d){return d.key;},
+                y: function(d){return d.y;},
+                showLabels: true,
+                duration: 500,
+                labelThreshold: 0.01,
+                labelSunbeamLayout: true,
+                legend: {
+                    margin: {
+                        top: 5,
+                        right: 35,
+                        bottom: 5,
+                        left: 0
+                    }
+                }
+            }
+	}
 
 	$http.get('/api/projects/' + projectId).success(function(project){
 		console.log('RESPONSE1:', project)

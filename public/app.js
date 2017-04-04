@@ -348,6 +348,32 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 				y: 100 - res.values[0][1]
 			}
 		]
+		var data = [
+			{
+				x: 0,
+				y: 1
+			},
+			{
+				x: 1,
+				y: 2
+			},
+			{
+				x: 2,
+				y: 3
+			},
+			{
+				x: 3,
+				y: 2
+			}
+		]
+		$scope.memData = [
+			{
+				values: data,      //values - represents the array of {x,y} data points
+				key: 'Test Data', //key  - the name of the series.
+				color: '#2ca02c',  //color - optional: choose your own line color.
+				area: false
+			}
+		]
 		$timeout(function(){
 			getStat()
 		}, 1000)
@@ -373,6 +399,46 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
                     }
                 }
             }
+	}
+
+	$scope.memOptions = {
+		chart: {
+			type: 'lineChart',
+			height: 400,
+			margin : {
+				top: 20,
+				right: 20,
+				bottom: 40,
+				left: 55
+			},
+			x: function(d){ return d.x; },
+			y: function(d){ return d.y; },
+			useInteractiveGuideline: true,
+			xAxis: {
+				axisLabel: 'X'
+			},
+			yAxis: {
+				axisLabel: 'Y',
+				tickFormat: function(d){
+					return d3.format('.02f')(d);
+				},
+				axisLabelDistance: -10
+			},
+			tooltip: {
+				enabled: true,
+				distance: 0,
+				position: function () {
+					return {
+						left: 500,
+						top: 500
+					}
+				}
+			}
+		},
+		title: {
+			enable: true,
+			text: 'Test Chart'
+		}
 	}
 
 	$http.get('/api/projects/' + projectId).success(function(project){

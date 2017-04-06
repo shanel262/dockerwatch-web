@@ -338,40 +338,106 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 		$scope.time = time.substring(11, 25)
 		$scope.cpu = res.values[0][1]
 		$scope.mem = res.values[0][2]
-		$scope.cpuData = [
+		var cpuInfo = [
 			{
-				key: "Used",
-				y: res.values[0][1]
+				x: "2017-03-12T15:10:51.064Z",
+				y: 30.96
 			},
 			{
-				key: "Free",
-				y: 100 - res.values[0][1]
+				x: "2017-03-12T15:10:52.064Z",
+				y: 35.65
+			},
+			{
+				x: "2017-03-12T15:10:53.064Z",
+				y: 38.5
+			},
+			{
+				x: "2017-03-12T15:10:54.064Z",
+				y: 40.62
+			},
+			{
+				x: "2017-03-12T15:10:55.064Z",
+				y: 45
+			},
+			{
+				x: "2017-03-12T15:10:56.064Z",
+				y: 50
+			},
+			{
+				x: "2017-03-12T15:10:57.064Z",
+				y: 42
+			},
+			{
+				x: "2017-03-12T15:10:58.064Z",
+				y: 38
+			},
+			{
+				x: "2017-03-12T15:10:59.064Z",
+				y: 16
+			},
+			{
+				x: "2017-03-12T15:11:00.064Z",
+				y: 45
 			}
 		]
-		var data = [
+		$scope.cpuData = [
 			{
-				x: 0,
-				y: 1
+				values: cpuInfo,      //values - represents the array of {x,y} data points
+				key: 'CPU usage', //key  - the name of the series.
+				color: '#2ca02c',  //color - optional: choose your own line color.
+				// area: false,
+				classed: 'dashed'
+			}
+		]
+		var memInfo = [
+			{
+				x: "2017-03-12T15:10:51.064Z",
+				y: 15.96
 			},
 			{
-				x: 1,
-				y: 2
+				x: "2017-03-12T15:10:52.064Z",
+				y: 17.65
 			},
 			{
-				x: 2,
-				y: 3
+				x: "2017-03-12T15:10:53.064Z",
+				y: 19.5
 			},
 			{
-				x: 3,
-				y: 2
+				x: "2017-03-12T15:10:54.064Z",
+				y: 20.62
+			},
+			{
+				x: "2017-03-12T15:10:55.064Z",
+				y: 22
+			},
+			{
+				x: "2017-03-12T15:10:56.064Z",
+				y: 25
+			},
+			{
+				x: "2017-03-12T15:10:57.064Z",
+				y: 21
+			},
+			{
+				x: "2017-03-12T15:10:58.064Z",
+				y: 15
+			},
+			{
+				x: "2017-03-12T15:10:59.064Z",
+				y: 5
+			},
+			{
+				x: "2017-03-12T15:11:00.064Z",
+				y: 7
 			}
 		]
 		$scope.memData = [
 			{
-				values: data,      //values - represents the array of {x,y} data points
-				key: 'Test Data', //key  - the name of the series.
-				color: '#2ca02c',  //color - optional: choose your own line color.
-				area: false
+				values: memInfo,      //values - represents the array of {x,y} data points
+				key: 'Memory usage', //key  - the name of the series.
+				color: '#7777ff',  //color - optional: choose your own line color.
+				// area: false,
+				classed: 'dashed'
 			}
 		]
 		$timeout(function(){
@@ -380,64 +446,123 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 	}
 	getStat()
 
-	$scope.cpuOptions = {
-		chart: {
-                type: 'pieChart',
-                height: 500,
-                x: function(d){return d.key;},
-                y: function(d){return d.y;},
-                showLabels: true,
-                duration: 500,
-                labelThreshold: 0.01,
-                labelSunbeamLayout: true,
-                legend: {
-                    margin: {
-                        top: 5,
-                        right: 35,
-                        bottom: 5,
-                        left: 0
-                    }
-                }
-            }
-	}
-
 	$scope.memOptions = {
 		chart: {
 			type: 'lineChart',
-			height: 400,
+			height: 375,
 			margin : {
 				top: 20,
-				right: 20,
+				right: 30,
 				bottom: 40,
-				left: 55
+				left: 50
 			},
-			x: function(d){ return d.x; },
+			x: function(d){return d3.time.format.iso.parse(d['x'])},
 			y: function(d){ return d.y; },
-			useInteractiveGuideline: true,
-			xAxis: {
-				axisLabel: 'X'
-			},
-			yAxis: {
-				axisLabel: 'Y',
-				tickFormat: function(d){
-					return d3.format('.02f')(d);
+			dispatch: {
+				tooltipShow: function(){
+					console.log('TOOLTIP SHOW')
 				},
-				axisLabelDistance: -10
+				tooltipHide: function(){
+					console.log('TOOLTIP HIDE')
+				}
 			},
+			useInteractiveGuideline: true,
+			interactive: true,
+			// isArea: false,
+			useVoronoi: false,
 			tooltip: {
 				enabled: true,
-				distance: 0,
+				contentGenerator: function () { //return html content
+					console.log('IN CONTENT GENERATOR')
+					return '<h1>HELLO SHANE</h1>';
+				},
 				position: function () {
+					console.log('EVENT:', d3.event)
 					return {
-						left: 500,
-						top: 500
+						left: d3.event !== null ? d3.event.clientX : 0,
+						top: d3.event !== null ? d3.event.clientY : 0
 					}
 				}
-			}
+			},
+			xAxis: {
+				axisLabel: 'Time (hour/minute/second)',
+				tickFormat: xTickFormatFunction(),
+				axisLabelDistance: 0
+			},
+			yAxis: {
+				axisLabel: 'Memory usage (%)',
+				// tickFormat: function(d){
+				// 	return d3.format('.02f')(d);
+				// },
+				axisLabelDistance: -20			},
+			forceY: [0, 100]
 		},
 		title: {
 			enable: true,
-			text: 'Test Chart'
+			text: 'Memory usage (%)'
+		}
+	}
+
+	$scope.cpuOptions = {
+		chart: {
+			type: 'lineChart',
+			height: 375,
+			margin : {
+				top: 20,
+				right: 30,
+				bottom: 40,
+				left: 50
+			},
+			x: function(d){return d3.time.format.iso.parse(d['x'])},
+			y: function(d){ return d.y; },
+			dispatch: {
+				tooltipShow: function(){
+					console.log('TOOLTIP SHOW')
+				},
+				tooltipHide: function(){
+					console.log('TOOLTIP HIDE')
+				}
+			},
+			useInteractiveGuideline: true,
+			interactive: true,
+			// isArea: false,
+			useVoronoi: false,
+			tooltip: {
+				enabled: true,
+				contentGenerator: function () { //return html content
+					console.log('IN CONTENT GENERATOR')
+					return '<h1>HELLO SHANE</h1>';
+				},
+				position: function () {
+					console.log('EVENT:', d3.event)
+					return {
+						left: d3.event !== null ? d3.event.clientX : 0,
+						top: d3.event !== null ? d3.event.clientY : 0
+					}
+				}
+			},
+			xAxis: {
+				axisLabel: 'Time (hour/minute/second)',
+				tickFormat: xTickFormatFunction(),
+				axisLabelDistance: 0
+			},
+			yAxis: {
+				axisLabel: 'CPU usage (%)',
+				// tickFormat: function(d){
+				// 	return d3.format('.02f')(d);
+				// },
+				axisLabelDistance: -20			},
+			forceY: [0, 100]
+		},
+		title: {
+			enable: true,
+			text: 'CPU usage (%)'
+		}
+	}
+
+	function xTickFormatFunction(){
+		return function(d){
+			 return d3.time.format('%H:%M:%S')(new Date(d))
 		}
 	}
 

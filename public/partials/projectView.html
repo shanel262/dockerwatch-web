@@ -10,8 +10,8 @@
 			<div class="panel panel-primary">
 				<div class="panel-heading">
 					<b>Project ID: {{id}}</b>
-					<a href="#/edit-project/{{id}}" class="btn btn-success btn-md">Edit</a>
-					<a ng-click="deleteProject()" class="btn btn-danger btn-md">Delete</a>
+					<a href="#/edit-project/{{id}}" class="btn btn-success btn-sm">Edit</a>
+					<a ng-click="deleteProject()" class="btn btn-danger btn-sm">Delete</a>
 				</div>
 				<div class="panel-body">
 					Name: <b>{{name}}</b><br>
@@ -21,7 +21,7 @@
 			</div>
 			<div class="panel panel-primary">
 				<div class="panel-heading"><b>Containers</b>
-					<button type="button" class="btn btn-success" data-toggle="modal" data-target="#addCon-modal">Add container</button>
+					<button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#addCon-modal">Add container</button>
 				</div>
 				<div class="panel-body">
 					<div class="panel panel-success" ng-repeat="container in containers"> <!--NEVER APPLY A FILTER TO THIS $INDEX WILL CAUSE A BUG-->

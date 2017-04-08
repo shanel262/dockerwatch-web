@@ -13,7 +13,7 @@ var influx = new influxdb({
 
 exports.getStat = function(req, res){
 	var containerId = req.params.containerId
-	var query = 'select * from "' + containerId + '" ORDER BY time DESC LIMIT 1'
+	var query = 'select * from "' + containerId + '" ORDER BY time DESC LIMIT 10'
 	influx.queryRaw(query).then(results => {
 		var stats = Promise.resolve(results).then(function(v){
 			return v.results[0].series[0]

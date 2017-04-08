@@ -338,48 +338,7 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 		$scope.time = time.substring(11, 25)
 		$scope.cpu = res.values[0][1]
 		$scope.mem = res.values[0][2]
-		var cpuInfo = [
-			{
-				x: "2017-03-12T15:10:51.064Z",
-				y: 30.96
-			},
-			{
-				x: "2017-03-12T15:10:52.064Z",
-				y: 35.65
-			},
-			{
-				x: "2017-03-12T15:10:53.064Z",
-				y: 38.5
-			},
-			{
-				x: "2017-03-12T15:10:54.064Z",
-				y: 40.62
-			},
-			{
-				x: "2017-03-12T15:10:55.064Z",
-				y: 45
-			},
-			{
-				x: "2017-03-12T15:10:56.064Z",
-				y: 50
-			},
-			{
-				x: "2017-03-12T15:10:57.064Z",
-				y: 42
-			},
-			{
-				x: "2017-03-12T15:10:58.064Z",
-				y: 38
-			},
-			{
-				x: "2017-03-12T15:10:59.064Z",
-				y: 16
-			},
-			{
-				x: "2017-03-12T15:11:00.064Z",
-				y: 45
-			}
-		]
+		var cpuInfo = parseInfluxData(res.values, 1)
 		$scope.cpuData = [
 			{
 				values: cpuInfo,      //values - represents the array of {x,y} data points
@@ -389,48 +348,7 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 				classed: 'dashed'
 			}
 		]
-		var memInfo = [
-			{
-				x: "2017-03-12T15:10:51.064Z",
-				y: 15.96
-			},
-			{
-				x: "2017-03-12T15:10:52.064Z",
-				y: 17.65
-			},
-			{
-				x: "2017-03-12T15:10:53.064Z",
-				y: 19.5
-			},
-			{
-				x: "2017-03-12T15:10:54.064Z",
-				y: 20.62
-			},
-			{
-				x: "2017-03-12T15:10:55.064Z",
-				y: 22
-			},
-			{
-				x: "2017-03-12T15:10:56.064Z",
-				y: 25
-			},
-			{
-				x: "2017-03-12T15:10:57.064Z",
-				y: 21
-			},
-			{
-				x: "2017-03-12T15:10:58.064Z",
-				y: 15
-			},
-			{
-				x: "2017-03-12T15:10:59.064Z",
-				y: 5
-			},
-			{
-				x: "2017-03-12T15:11:00.064Z",
-				y: 7
-			}
-		]
+		var memInfo = parseInfluxData(res.values, 2)
 		$scope.memData = [
 			{
 				values: memInfo,      //values - represents the array of {x,y} data points
@@ -442,9 +360,21 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 		]
 		$timeout(function(){
 			getStat()
-		}, 1000)
+		}, 2000)
 	}
 	getStat()
+
+	function parseInfluxData(data, dataPos){
+		var jsonArray = []
+		for(var i = 0; i <= data.length -1; i++){
+			var json = {
+				x: data[i][0],
+				y: parseFloat(data[i][dataPos])
+			}
+			jsonArray.push(json)
+		}
+		return jsonArray
+	}
 
 	$scope.memOptions = {
 		chart: {

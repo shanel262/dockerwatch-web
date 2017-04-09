@@ -337,7 +337,7 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 		$scope.date = time.substring(0, 10)
 		$scope.time = time.substring(11, 25)
 		$scope.cpu = res.values[0][1]
-		$scope.mem = res.values[0][2]
+		$scope.mem = res.values[0][6]
 		var cpuInfo = parseInfluxData(res.values, 1)
 		$scope.cpuData = [
 			{
@@ -348,7 +348,7 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 				classed: 'dashed'
 			}
 		]
-		var memInfo = parseInfluxData(res.values, 2)
+		var memInfo = parseInfluxData(res.values, 6)
 		$scope.memData = [
 			{
 				values: memInfo,      //values - represents the array of {x,y} data points
@@ -367,11 +367,16 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 	function parseInfluxData(data, dataPos){
 		var jsonArray = []
 		for(var i = 0; i <= data.length -1; i++){
-			var json = {
-				x: data[i][0],
-				y: parseFloat(data[i][dataPos])
+			if(data[i][12] === 'stat'){
+				var json = {
+					x: data[i][0],
+					y: parseFloat(data[i][dataPos])
+				}
+				jsonArray.push(json)
 			}
-			jsonArray.push(json)
+			else{
+				console.log('RECEIVED CONTAINER INFO:', data[i])
+			}
 		}
 		return jsonArray
 	}

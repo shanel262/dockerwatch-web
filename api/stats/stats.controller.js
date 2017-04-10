@@ -13,10 +13,21 @@ var influx = new influxdb({
 
 exports.getStat = function(req, res){
 	var containerId = req.params.containerId
-	var query = 'select * from "' + containerId + '" ORDER BY time DESC LIMIT 10'
+	var query = 'select * from "' + containerId + '"' + " WHERE type='stat' ORDER BY time DESC LIMIT 10"
 	influx.queryRaw(query).then(results => {
 		var stats = Promise.resolve(results).then(function(v){
-			console.log('V:', v.results[0].series[0])
+			return v.results[0].series[0]
+		}).then(function(stats){
+			return res.send(200, stats)			
+		})
+	})
+}
+
+exports.getInfo = function(req, res){
+	var containerId = req.params.containerId
+	var query = 'select * from "' + containerId + '"' + " WHERE type='info' ORDER BY time DESC LIMIT 1"
+	influx.queryRaw(query).then(results => {
+		var stats = Promise.resolve(results).then(function(v){
 			return v.results[0].series[0]
 		}).then(function(stats){
 			return res.send(200, stats)			

@@ -325,19 +325,21 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 	function getStat(){
 		SingleContainerService.getStat(containerId).then(function(res){
 			if(Date.parse(res.values[0][0]) > mostRecentTime){
-				update(res)
+				updateStats(res)
 				mostRecentTime = Date.parse(res.values[0][0])
 			}
 		})		
 	}
+	function getInfo(){
+		SingleContainerService.getInfo(containerId).then(function(res){
+			updateInfo(res)
+		})
+	}
 
-	function update(res){
-		$scope.name = res.name
-		var time = res.values[0][0]
-		$scope.date = time.substring(0, 10)
-		$scope.time = time.substring(11, 25)
-		$scope.cpu = res.values[0][1]
-		$scope.mem = res.values[0][6]
+	function updateStats(res){
+		console.log('updateStatsRes:', res)
+		$scope.conID = res.name
+		$scope.dateTime = parseTime(res.values[0][0], 25)
 		var cpuInfo = parseInfluxData(res.values, 1)
 		$scope.cpuData = [
 			{
@@ -362,7 +364,30 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 			getStat()
 		}, 2000)
 	}
+	function updateInfo(res){
+		console.log('updateInfoRes:', res.values[0])
+		$scope.conName = res.values[0][7]
+		$scope.created = parseTime(res.values[0][2], 19)
+		$scope.image = res.values[0][3]
+		$scope.ipAddress = res.values[0][4]
+		$scope.macAddress = res.values[0][5]
+		$scope.port = res.values[0][8]
+		$scope.restartCount = res.values[0][9]
+		$scope.state = JSON.parse(res.values[0][10]).Status
+		$scope.startedAt = parseTime(JSON.parse(res.values[0][10]).StartedAt, 19)
+		$scope.subnetAddress = res.values[0][11]
+		$scope.lastUpdatedAt = parseTime(res.values[0][0], 19)
+		$scope.$apply()
+	}
 	getStat()
+	getInfo()
+
+	function parseTime(time, cutoff){
+		var date = time.substring(0, 10)
+		var time = time.substring(11, cutoff)
+		var conCat = date + ' - ' + time
+		return conCat
+	}
 
 	function parseInfluxData(data, dataPos){
 		var jsonArray = []
@@ -505,8 +530,7 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 		console.log('RESPONSE1:', project)
 		var utcTime = dateFromObjectID(project._id)
 		$scope.utcTime = utcTime
-		$scope.projectDate = utcTime.substring(0, 10)
-		$scope.projectTime = utcTime.substring(11, 19)
+		$scope.projectDate = parseTime(utcTime, 19)
 		$scope.projectName = project.name
 		$scope.owner = project.owner
 		$scope.id = project._id
@@ -541,7 +565,7 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 			console.log('Delete container')
 			var updatedContainers = ''
 			for (var i = 0; i <= $scope.containers.length - 1; i++) {
-				if($scope.containers[i] == $scope.name){
+				if($scope.containers[i] == $scope.conID){
 					//Do nothing to leave it out of updated containers list
 				}
 				else{
@@ -585,6 +609,15 @@ dockerWatch.factory('SingleContainerService', ["$location", "$http", function($l
 					return v.data
 				})
 				return stats
+			})
+		},
+		getInfo: function(containerId){
+			return $http.get('api/stats/getInfo/' + containerId)
+			.then(function(response){
+				var info = Promise.resolve(response).then(function(v){
+					return v.data
+				})
+				return info
 			})
 		}
 	}

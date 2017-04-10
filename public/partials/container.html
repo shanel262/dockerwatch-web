@@ -1,20 +1,39 @@
 <div class="container-fluid" ng-controller="SingleContainerController">
 	<div class="row">
-		<div class="col-md-3">
+		<div class="col-md-4">
 			<div class="panel panel-primary">
 				<div class="panel-heading">
-					<b>Project ID: {{id}}</b>
+					<b>Project Information</b>
 				</div>
 				<div class="panel-body">
+					ID: <b>{{id}}</b><br>
 					Name: <b>{{projectName}}</b><br>
 					Created by: <b>{{owner}}</b><br>
-					Created on: <b>{{projectTime}} - {{projectDate}}</b>
+					Created at: <b>{{projectDate}}</b>
+				</div>
+			</div>
+			<div class="panel panel-primary">
+				<div class="panel-heading">
+					<b>Container Information</b>
+				</div>
+				<div class="panel-body">
+					ID: <b>{{conID}}</b><br>
+					Name: <b>{{conName}}</b><br>
+					State: <b style='color:green'>{{state}}</b><br>
+					Last Started At: <b>{{startedAt}}</b><br>
+					Image: <b>{{image}}</b><br>
+					Created at: <b>{{created}}</b><br>
+					IP Address/port: <b>{{ipAddress}}:{{port}}</b><br>
+					CIDR: <b>{{subnetAddress}}</b><br>
+					MAC Address: <b>{{macAddress}}</b><br>
+					Restart Count: <b>{{restartCount}}</b><br>
+					<p style="color:grey">Last Updated At: {{lastUpdatedAt}}</p>
 				</div>
 			</div>
 			<div class="panel panel-primary">
 				<div class="panel-heading"><b>Other Containers</b></div>
 				<div class="panel-body">
-					<div class="panel panel-success" ng-repeat="container in containers" ng-hide="areSame(container, name)"> <!--NEVER APPLY A FILTER TO THIS $INDEX WILL CAUSE A BUG-->
+					<div class="panel panel-success" ng-repeat="container in containers" ng-hide="areSame(container, conID)"> <!--NEVER APPLY A FILTER TO THIS $INDEX WILL CAUSE A BUG-->
 						<div class="panel-heading"><a href="#/container/{{projectContainerConcat[$index]}}">Container ID: {{container}}</a></div>
 						<div class="panel-body">
 							<ul>
@@ -25,11 +44,11 @@
 				</div>						
 			</div>
 		</div>
-		<div class="col-md-9">
+		<div class="col-md-8">
 			<div class="panel panel-primary">
-				<div class="panel-heading"><b>Container ID: {{name}}  </b><a ng-click="deleteContainer()" class="btn btn-danger btn-sm">Delete</a></div>
+				<div class="panel-heading"><b>Container ID: {{conID}}  </b><a ng-click="deleteContainer()" class="btn btn-danger btn-sm">Delete</a></div>
 				<div class="panel-body">
-					<p class="graph-bottom-gap">Date: <b>{{date}}</b>   Time: <b>{{time}}</b></p>
+					<p class="graph-bottom-gap">Date: <b>{{dateTime}}</b>
 					<!-- <hr> -->
 					<div class="col-md-12 graph-bottom-gap">
 						<nvd3 options='cpuOptions' data='cpuData'></nvd3>

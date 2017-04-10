@@ -316,7 +316,7 @@ dockerWatch.factory('SingleProjectService', ["$http", function($http){
 	}
 }])
 
-//Home
+//Single Container View
 dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerService", "$route", "$timeout", "$routeParams", "$http", "$window", "$location", function($scope, SingleContainerService, $route, $timeout, $routeParams, $http, $window, $location){
 	var split = $routeParams.containerID.split('.')
 	var projectId = split[0]
@@ -376,8 +376,13 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 		$scope.state = JSON.parse(res.values[0][10]).Status
 		$scope.startedAt = parseTime(JSON.parse(res.values[0][10]).StartedAt, 19)
 		$scope.subnetAddress = res.values[0][11]
-		$scope.lastUpdatedAt = parseTime(res.values[0][0], 19)
+		$scope.lastUpdateFromCon = parseTime(res.values[0][0], 19)
+		var currentTime = new Date()
+		$scope.lastUpdatedAt = currentTime.toUTCString()
 		$scope.$apply()
+		$timeout(function(){
+			getInfo()
+		}, 300000) //Wait 5 minutes
 	}
 	getStat()
 	getInfo()

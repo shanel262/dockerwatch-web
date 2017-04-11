@@ -362,6 +362,18 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 		]
 		$scope.memBytes = parseMem(res.values[0][res.columns.indexOf('memBytes')])
 		$scope.memPerc = res.values[0][res.columns.indexOf('memPerc')]
+		var rxBytes = parseInfluxData(res, res.columns.indexOf('rxBytes'))
+		var txBytes = parseInfluxData(res, res.columns.indexOf('txBytes'))
+		$scope.bytesData = [
+			{
+				values: rxBytes,
+				key: 'Bytes received'
+			},
+			{
+				values: txBytes,
+				key: 'Bytes sent'
+			}
+		]
 		$scope.$apply()
 		$timeout(function(){
 			getStat()
@@ -543,6 +555,46 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 		title: {
 			enable: true,
 			text: 'CPU usage (%)'
+		}
+	}
+
+	$scope.rxBytesOptions = {
+		chart: {
+			type: 'lineChart',
+			height: 375,
+			margin : {
+				top: 20,
+				right: 30,
+				bottom: 40,
+				left: 60
+			},
+			x: function(d){return d3.time.format.iso.parse(d['x'])},
+			y: function(d){ return d.y; },
+			dispatch: {
+				tooltipShow: function(){
+					console.log('TOOLTIP SHOW')
+				},
+				tooltipHide: function(){
+					console.log('TOOLTIP HIDE')
+				}
+			},
+			useInteractiveGuideline: true,
+			interactive: true,
+			useVoronoi: false,
+			xAxis: {
+				axisLabel: 'Time (hour/minute/second)',
+				tickFormat: xTickFormatFunction(),
+				axisLabelDistance: 0
+			},
+			yAxis: {
+				axisLabel: 'Network bytes received',
+				axisLabelDistance: -5
+			},
+			forceY: [0]
+		},
+		title: {
+			enable: true,
+			text: 'Network bytes received'
 		}
 	}
 

@@ -340,7 +340,7 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 		console.log('updateStatsRes:', res)
 		$scope.conID = res.name
 		$scope.dateTime = parseTime(res.values[0][0], 25)
-		var cpuInfo = parseInfluxData(res.values, res.columns.indexOf('cpu'))
+		var cpuInfo = parseInfluxData(res, res.columns.indexOf('cpu'))
 		$scope.cpuData = [
 			{
 				values: cpuInfo,      //values - represents the array of {x,y} data points
@@ -350,7 +350,7 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 				classed: 'dashed'
 			}
 		]
-		var memInfo = parseInfluxData(res.values, res.columns.indexOf('mem'))
+		var memInfo = parseInfluxData(res, res.columns.indexOf('memPerc'))
 		$scope.memData = [
 			{
 				values: memInfo,      //values - represents the array of {x,y} data points
@@ -360,6 +360,9 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 				classed: 'dashed'
 			}
 		]
+		$scope.memBytes = parseMem(res.values[0][res.columns.indexOf('memBytes')])
+		$scope.memPerc = res.values[0][res.columns.indexOf('memPerc')]
+		$scope.$apply()
 		$timeout(function(){
 			getStat()
 		}, 2000)
@@ -378,6 +381,7 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 		$scope.startedAt = parseTime(JSON.parse(res.values[0][columns.indexOf('state')]).StartedAt, 19)
 		$scope.subnetAddress = res.values[0][columns.indexOf('subnetAddress')]
 		$scope.lastUpdateFromCon = parseTime(res.values[0][columns.indexOf('time')], 19)
+		$scope.memLimit = (res.values[0][columns.indexOf('memLimit')] !== 0) ? parseMem(res.values[0][columns.indexOf('memLimit')]) : 'NA'
 		var currentTime = new Date()
 		$scope.lastUpdatedAt = currentTime.toUTCString()
 		$scope.$apply()
@@ -388,6 +392,20 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 	getStat()
 	getInfo()
 
+	function parseMem(mem){
+		var memVal = '0'
+		if(mem.toString().length < 7){
+			memVal = (mem / 1024).toFixed(2) + 'KB'
+		}
+		else if(mem.toString().length < 10){
+			memVal = (mem / 1048576).toFixed(2) + 'MB'
+		}
+		else if(mem.toString().length < 13){
+			memVal = (mem / 1073741824).toFixed(2) + 'GB'
+		}
+		return memVal
+	}
+
 	function parseTime(time, cutoff){
 		var date = time.substring(0, 10)
 		var time = time.substring(11, cutoff)
@@ -397,16 +415,18 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 
 	function parseInfluxData(data, dataPos){
 		var jsonArray = []
-		for(var i = 0; i <= data.length -1; i++){
-			if(data[i][12] === 'stat'){
+		var values = data.values
+		var columns = data.columns
+		for(var i = 0; i <= values.length -1; i++){
+			if(values[i][columns.indexOf('type')] === 'stat'){
 				var json = {
-					x: data[i][0],
-					y: parseFloat(data[i][dataPos])
+					x: values[i][0],
+					y: parseFloat(values[i][dataPos])
 				}
 				jsonArray.push(json)
 			}
 			else{
-				console.log('RECEIVED CONTAINER INFO:', data[i])
+				console.log('RECEIVED CONTAINER INFO:', values[i])
 			}
 		}
 		return jsonArray

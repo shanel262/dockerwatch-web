@@ -340,7 +340,7 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 		console.log('updateStatsRes:', res)
 		$scope.conID = res.name
 		$scope.dateTime = parseTime(res.values[0][0], 25)
-		var cpuInfo = parseInfluxData(res.values, 1)
+		var cpuInfo = parseInfluxData(res.values, res.columns.indexOf('cpu'))
 		$scope.cpuData = [
 			{
 				values: cpuInfo,      //values - represents the array of {x,y} data points
@@ -350,7 +350,7 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 				classed: 'dashed'
 			}
 		]
-		var memInfo = parseInfluxData(res.values, 6)
+		var memInfo = parseInfluxData(res.values, res.columns.indexOf('mem'))
 		$scope.memData = [
 			{
 				values: memInfo,      //values - represents the array of {x,y} data points
@@ -365,18 +365,19 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 		}, 2000)
 	}
 	function updateInfo(res){
-		console.log('updateInfoRes:', res.values[0])
-		$scope.conName = res.values[0][7]
-		$scope.created = parseTime(res.values[0][2], 19)
-		$scope.image = res.values[0][3]
-		$scope.ipAddress = res.values[0][4]
-		$scope.macAddress = res.values[0][5]
-		$scope.port = res.values[0][8]
-		$scope.restartCount = res.values[0][9]
-		$scope.state = JSON.parse(res.values[0][10]).Status
-		$scope.startedAt = parseTime(JSON.parse(res.values[0][10]).StartedAt, 19)
-		$scope.subnetAddress = res.values[0][11]
-		$scope.lastUpdateFromCon = parseTime(res.values[0][0], 19)
+		console.log('updateInfoRes:', res)
+		var columns = res.columns //Influx returns positions of values array so use it
+		$scope.conName = res.values[0][columns.indexOf('name')]
+		$scope.created = parseTime(res.values[0][columns.indexOf('created')], 19)
+		$scope.image = res.values[0][columns.indexOf('image')]
+		$scope.ipAddress = res.values[0][columns.indexOf('ipAddress')]
+		$scope.macAddress = res.values[0][columns.indexOf('macAddress')]
+		$scope.port = res.values[0][columns.indexOf('port')]
+		$scope.restartCount = res.values[0][columns.indexOf('restartCount')]
+		$scope.state = JSON.parse(res.values[0][columns.indexOf('state')]).Status
+		$scope.startedAt = parseTime(JSON.parse(res.values[0][columns.indexOf('state')]).StartedAt, 19)
+		$scope.subnetAddress = res.values[0][columns.indexOf('subnetAddress')]
+		$scope.lastUpdateFromCon = parseTime(res.values[0][columns.indexOf('time')], 19)
 		var currentTime = new Date()
 		$scope.lastUpdatedAt = currentTime.toUTCString()
 		$scope.$apply()

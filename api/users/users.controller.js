@@ -1,5 +1,6 @@
+var passport = require('passport')
 var User = require('./users.model')
-var user = new User()
+
 
 function handleError(err) {
   console.log(err);
@@ -8,10 +9,34 @@ function handleError(err) {
 
 exports.login = function(req, res){
 	console.log('LOGIN API:', req.body)
-	return res.json(200, 'LOGIN API SUCCESS')
+	passport.authenticate('local', function(err, user, info){
+		var token
+		if(err){
+			return res.status(404).json(err)
+		}
+		if(user){
+			token = user.generateJwt()
+			return res.status(200).json({"token": token})
+		}
+		else{
+			return res.status(401).json(info)
+		}
+	})(req, res)
 }
 
 exports.register = function(req, res){
 	console.log('REGISTER API:', req.body)
-	return res.json(200, 'REGISTER API SUCCESS')
+	var user = new User()
+	user.name = req.body.name,
+	user.username = req.body.username
+	user.setPassword(req.body.password)
+	user.save(function(err){
+		var token
+		token = user.generateJwt()
+		res.status(200)
+		res.json({
+			"token": token
+		})
+	})
+	// return res.json(200, 'REGISTER API SUCCESS')
 }

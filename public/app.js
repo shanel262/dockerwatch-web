@@ -50,11 +50,18 @@ dockerWatch.controller('LoginController', ["$scope", "LoginService", function($s
 	}
 }])
 
-dockerWatch.factory('LoginService', ["$http", function($http){
+dockerWatch.factory('LoginService', ["$http", "$location", function($http, $location){
 	login = function(user){
 		console.log('Login service:', user)
 		$http.post('api/users/login/', user).then(function(res){
 			console.log('RETURNED:', res)
+			if(res.status == 200){
+				console.log('SUCCESSFUL LOGIN')
+				$location.path('/projects')
+			}
+			else if(res.status == 401 || res.status == 404){
+				console.log('FAILED LOGIN', res)
+			}
 		})
 	}
 }])
@@ -78,11 +85,18 @@ dockerWatch.controller('RegisterController', ["$scope", "RegisterService", funct
 	}
 }])
 
-dockerWatch.factory('RegisterService', ["$http", function($http){
+dockerWatch.factory('RegisterService', ["$http", "$location", function($http, $location){
 	register = function(user){
 		console.log('Register service:', user)
 		$http.post('api/users/register/', user).then(function(res){
 			console.log('RETURNED:', res)
+			if(res.status == 200){
+				console.log('SUCCESSFUL REGISTRATION')
+				$location.path('/login')
+			}
+			else{
+				console.log('FAILED REGISTRATION', res)
+			}
 		})
 	}
 }])

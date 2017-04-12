@@ -249,11 +249,11 @@ dockerWatch.controller('SingleProjectController', ["$scope", "SingleProjectServi
 
 	function analyse(res){
 		if(res.data.length == 0){
-			console.log('It does not exist in influx')
+			console.log('It does not exist in influx', res)
 			$scope.status = 'failure'
 		}
-		else if(res.data.length == 1){
-			console.log('It does exist in influx')
+		else if(res.data.length == 2){
+			console.log('It does exist in influx', res)
 			$scope.status = 'success'
 			var newConString
 			if($scope.containerString == undefined || $scope.containerString == ""){
@@ -275,7 +275,7 @@ dockerWatch.controller('SingleProjectController', ["$scope", "SingleProjectServi
 			}, 4000)
 		}
 		else{
-			console.log('Unexpected response')
+			console.log('Unexpected response', res)
 			$scope.status = "Error"
 		}
 		$scope.conId = ''
@@ -321,6 +321,7 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 	var split = $routeParams.containerID.split('.')
 	var projectId = split[0]
 	var containerId = split[1]
+	$scope.containerId = containerId
 	var mostRecentTime = 0
 	function getStat(){
 		SingleContainerService.getStat(containerId).then(function(res){
@@ -338,8 +339,10 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 
 	function updateStats(res){
 		console.log('updateStatsRes:', res)
-		$scope.conID = res.name
+		$scope.containerId
+		 = res.name
 		$scope.dateTime = parseTime(res.values[0][0], 25)
+		//CPU
 		var cpuInfo = parseInfluxData(res, res.columns.indexOf('cpu'))
 		$scope.cpuData = [
 			{
@@ -350,6 +353,8 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 				classed: 'dashed'
 			}
 		]
+		$scope.cpuPerc = res.values[0][res.columns.indexOf('cpu')]
+		//Mem
 		var memInfo = parseInfluxData(res, res.columns.indexOf('memPerc'))
 		$scope.memData = [
 			{
@@ -362,6 +367,7 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 		]
 		$scope.memBytes = parseMem(res.values[0][res.columns.indexOf('memBytes')])
 		$scope.memPerc = res.values[0][res.columns.indexOf('memPerc')]
+		//Network
 		var rxBytes = parseInfluxData(res, res.columns.indexOf('rxBytes'))
 		var txBytes = parseInfluxData(res, res.columns.indexOf('txBytes'))
 		$scope.bytesData = [
@@ -372,6 +378,42 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 			{
 				values: txBytes,
 				key: 'Bytes sent'
+			}
+		]
+		var rxPackets = parseInfluxData(res, res.columns.indexOf('rxPackets'))
+		var txPackets = parseInfluxData(res, res.columns.indexOf('txPackets'))
+		$scope.packetsData = [
+			{
+				values: rxPackets,
+				key: 'Packets received'
+			},
+			{
+				values: txPackets,
+				key: 'Packets sent'
+			}
+		]
+		var rxDropped = parseInfluxData(res, res.columns.indexOf('rxDropped'))
+		var txDropped = parseInfluxData(res, res.columns.indexOf('txDropped'))
+		$scope.droppedData = [
+			{
+				values: rxDropped,
+				key: 'Incoming packets dropped'
+			},
+			{
+				values: txDropped,
+				key: 'Outgoing packets dropped'
+			}
+		]
+		var rxError = parseInfluxData(res, res.columns.indexOf('rxError'))
+		var txError = parseInfluxData(res, res.columns.indexOf('txError'))
+		$scope.errorData = [
+			{
+				values: rxError,
+				key: 'Incoming errors'
+			},
+			{
+				values: txError,
+				key: 'Outgoing errors'
 			}
 		]
 		$scope.$apply()
@@ -464,7 +506,7 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 					console.log('TOOLTIP HIDE')
 				}
 			},
-			useInteractiveGuideline: true,
+			useInteractiveGuideline: false,
 			interactive: true,
 			// isArea: false,
 			useVoronoi: false,
@@ -513,32 +555,10 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 			},
 			x: function(d){return d3.time.format.iso.parse(d['x'])},
 			y: function(d){ return d.y; },
-			dispatch: {
-				tooltipShow: function(){
-					console.log('TOOLTIP SHOW')
-				},
-				tooltipHide: function(){
-					console.log('TOOLTIP HIDE')
-				}
-			},
-			useInteractiveGuideline: true,
+			useInteractiveGuideline: false,
 			interactive: true,
 			// isArea: false,
 			useVoronoi: false,
-			tooltip: {
-				enabled: true,
-				contentGenerator: function () { //return html content
-					console.log('IN CONTENT GENERATOR')
-					return '<h1>HELLO SHANE</h1>';
-				},
-				position: function () {
-					console.log('EVENT:', d3.event)
-					return {
-						left: d3.event !== null ? d3.event.clientX : 0,
-						top: d3.event !== null ? d3.event.clientY : 0
-					}
-				}
-			},
 			xAxis: {
 				axisLabel: 'Time (hour/minute/second)',
 				tickFormat: xTickFormatFunction(),
@@ -549,7 +569,8 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 				// tickFormat: function(d){
 				// 	return d3.format('.02f')(d);
 				// },
-				axisLabelDistance: -20			},
+				axisLabelDistance: -20
+			},
 			forceY: [0, 100]
 		},
 		title: {
@@ -558,7 +579,7 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 		}
 	}
 
-	$scope.rxBytesOptions = {
+	$scope.bytesOptions = {
 		chart: {
 			type: 'lineChart',
 			height: 375,
@@ -570,15 +591,7 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 			},
 			x: function(d){return d3.time.format.iso.parse(d['x'])},
 			y: function(d){ return d.y; },
-			dispatch: {
-				tooltipShow: function(){
-					console.log('TOOLTIP SHOW')
-				},
-				tooltipHide: function(){
-					console.log('TOOLTIP HIDE')
-				}
-			},
-			useInteractiveGuideline: true,
+			useInteractiveGuideline: false,
 			interactive: true,
 			useVoronoi: false,
 			xAxis: {
@@ -587,14 +600,110 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 				axisLabelDistance: 0
 			},
 			yAxis: {
-				axisLabel: 'Network bytes received',
+				axisLabel: 'Network bytes',
 				axisLabelDistance: -5
 			},
 			forceY: [0]
 		},
 		title: {
 			enable: true,
-			text: 'Network bytes received'
+			text: 'Network bytes'
+		}
+	}
+
+	$scope.packetsOptions = {
+		chart: {
+			type: 'lineChart',
+			height: 375,
+			margin : {
+				top: 20,
+				right: 30,
+				bottom: 40,
+				left: 60
+			},
+			x: function(d){return d3.time.format.iso.parse(d['x'])},
+			y: function(d){ return d.y; },
+			useInteractiveGuideline: false,
+			interactive: true,
+			useVoronoi: false,
+			xAxis: {
+				axisLabel: 'Time (hour/minute/second)',
+				tickFormat: xTickFormatFunction(),
+				axisLabelDistance: 0
+			},
+			yAxis: {
+				axisLabel: 'Network packets',
+				axisLabelDistance: -5
+			},
+			forceY: [0]
+		},
+		title: {
+			enable: true,
+			text: 'Network packets'
+		}
+	}
+
+	$scope.droppedOptions = {
+		chart: {
+			type: 'lineChart',
+			height: 375,
+			margin : {
+				top: 20,
+				right: 30,
+				bottom: 40,
+				left: 60
+			},
+			x: function(d){return d3.time.format.iso.parse(d['x'])},
+			y: function(d){ return d.y; },
+			useInteractiveGuideline: false,
+			interactive: true,
+			useVoronoi: false,
+			xAxis: {
+				axisLabel: 'Time (hour/minute/second)',
+				tickFormat: xTickFormatFunction(),
+				axisLabelDistance: 0
+			},
+			yAxis: {
+				axisLabel: 'Network packets dropped',
+				axisLabelDistance: -5
+			},
+			forceY: [0]
+		},
+		title: {
+			enable: true,
+			text: 'Network packets dropped'
+		}
+	}
+
+	$scope.errorOptions = {
+		chart: {
+			type: 'lineChart',
+			height: 375,
+			margin : {
+				top: 20,
+				right: 30,
+				bottom: 40,
+				left: 60
+			},
+			x: function(d){return d3.time.format.iso.parse(d['x'])},
+			y: function(d){ return d.y; },
+			useInteractiveGuideline: false,
+			interactive: true,
+			useVoronoi: false,
+			xAxis: {
+				axisLabel: 'Time (hour/minute/second)',
+				tickFormat: xTickFormatFunction(),
+				axisLabelDistance: 0
+			},
+			yAxis: {
+				axisLabel: 'Network errors',
+				axisLabelDistance: -5
+			},
+			forceY: [0]
+		},
+		title: {
+			enable: true,
+			text: 'Network errors'
 		}
 	}
 
@@ -643,7 +752,7 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 			console.log('Delete container')
 			var updatedContainers = ''
 			for (var i = 0; i <= $scope.containers.length - 1; i++) {
-				if($scope.containers[i] == $scope.conID){
+				if($scope.containers[i] == $scope.containerId){
 					//Do nothing to leave it out of updated containers list
 				}
 				else{

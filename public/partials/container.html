@@ -17,7 +17,7 @@
 					<b>Container Information</b>
 				</div>
 				<div class="panel-body">
-					ID: <b>{{conID}}</b><br>
+					ID: <b>{{containerId}}</b><br>
 					Name: <b>{{conName}}</b><br>
 					State: <b style='color:green'>{{state}}</b><br>
 					Last Started At: <b>{{startedAt}}</b><br>
@@ -39,7 +39,7 @@
 			<div class="panel panel-primary">
 				<div class="panel-heading"><b>Other Containers</b></div>
 				<div class="panel-body">
-					<div class="panel panel-success" ng-repeat="container in containers" ng-hide="areSame(container, conID)"> <!--NEVER APPLY A FILTER TO THIS $INDEX WILL CAUSE A BUG-->
+					<div class="panel panel-success" ng-repeat="container in containers" ng-hide="areSame(container, containerId)"> <!--NEVER APPLY A FILTER TO THIS $INDEX WILL CAUSE A BUG-->
 						<div class="panel-heading"><a href="#/container/{{projectContainerConcat[$index]}}">Container ID: {{container}}</a></div>
 						<div class="panel-body">
 							<ul>
@@ -52,11 +52,17 @@
 		</div>
 		<div class="col-md-8">
 			<div class="panel panel-primary">
-				<div class="panel-heading"><b>Container ID: {{conID}}  </b><a ng-click="deleteContainer()" class="btn btn-danger btn-sm">Delete</a></div>
+				<div class="panel-heading"><b>Container ID: {{containerId}}  </b><a ng-click="deleteContainer()" class="btn btn-danger btn-sm">Delete</a></div>
 				<div class="panel-body">
 					<p class="graph-bottom-gap">Date: <b>{{dateTime}}</b>
 					<!-- <hr> -->
 					<div class="col-md-12 graph-bottom-gap">
+						<p style="padding-top: 10px; text-align: center; font-size: 20px;">
+							Percentage:
+							<b style="color: green" ng-if="cpuPerc <= 60">{{cpuPerc}}%</b>
+							<b style="color: orange" ng-if="cpuPerc > 60 && cpuPerc <= 85">{{cpuPerc}}%</b>
+							<b style="color: red" ng-if="cpuPerc > 85">{{cpuPerc}}%</b>
+						</p>
 						<nvd3 options='cpuOptions' data='cpuData'></nvd3>
 					</div>
 					<div class="col-md-12 graph-bottom-gap">
@@ -73,7 +79,16 @@
 						<nvd3 options='memOptions' data='memData'></nvd3>
 					</div>
 					<div class="col-md-12 graph-bottom-gap">
-						<nvd3 options='rxBytesOptions' data='bytesData'></nvd3>
+						<nvd3 options='bytesOptions' data='bytesData'></nvd3>
+					</div>
+					<div class="col-md-12 graph-bottom-gap">
+						<nvd3 options='packetsOptions' data='packetsData'></nvd3>
+					</div>
+					<div class="col-md-6 graph-bottom-gap">
+						<nvd3 options='droppedOptions' data='droppedData'></nvd3>
+					</div>
+					<div class="col-md-6 graph-bottom-gap">
+						<nvd3 options='errorOptions' data='errorData'></nvd3>
 					</div>
 				</div>
 			</div>

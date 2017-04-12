@@ -54,9 +54,19 @@
 			<div class="panel panel-primary">
 				<div class="panel-heading"><b>Container ID: {{containerId}}  </b><a ng-click="deleteContainer()" class="btn btn-danger btn-sm">Delete</a></div>
 				<div class="panel-body">
-					<p class="graph-bottom-gap">Date: <b>{{dateTime}}</b>
-					<!-- <hr> -->
-					<div class="col-md-12 graph-bottom-gap">
+					<div class="dropdown" style="padding-bottom: 5px">
+						<button class="btn btn-warning dropdown-toggle" type="button" data-toggle="dropdown">Show Graphs <span class="caret"></span></button>
+						<ul class="dropdown-menu" style="padding-left: 10px; padding-right: 10px;">
+							<li style="border-bottom: thin solid lightgrey;"><label><input type="checkbox" name="cpu" ng-model="showGraphs.cpu" checked>CPU</label></li>
+							<li style="border-bottom: thin solid lightgrey;"><label><input type="checkbox" name="mem" ng-model="showGraphs.mem" checked>Memory</label></li>
+							<li style="border-bottom: thin solid lightgrey;"><label><input type="checkbox" name="bytes" ng-model="showGraphs.bytes" checked>Network Bytes</label></li>
+							<li style="border-bottom: thin solid lightgrey;"><label><input type="checkbox" name="packets" ng-model="showGraphs.packets" checked>Network Packets</label></li>
+							<li style="border-bottom: thin solid lightgrey;"><label><input type="checkbox" name="dropped" ng-model="showGraphs.dropped" checked>Network Dropped</label></li>
+							<li><label><input type="checkbox" name="error" ng-model="showGraphs.error" checked>Network Errors</label></li>
+						</ul>
+					</div>
+					<p class="graph-bottom-gap">Received from container at: <b>{{dateTime}}</b>
+					<div class="col-md-12 graph-bottom-gap" ng-show="showGraphs.cpu == true">
 						<p style="padding-top: 10px; text-align: center; font-size: 20px;">
 							Percentage:
 							<b style="color: green" ng-if="cpuPerc <= 60">{{cpuPerc}}%</b>
@@ -65,7 +75,7 @@
 						</p>
 						<nvd3 options='cpuOptions' data='cpuData'></nvd3>
 					</div>
-					<div class="col-md-12 graph-bottom-gap">
+					<div class="col-md-12 graph-bottom-gap" ng-show="showGraphs.mem == true">
 						<p style="padding-top: 10px; text-align: center; font-size: 20px;">
 							Memory Usage/Available: 
 							<b style="color: green" ng-if="memPerc <= 60">{{memBytes}}/{{memLimit}}</b>
@@ -78,16 +88,22 @@
 						</p>
 						<nvd3 options='memOptions' data='memData'></nvd3>
 					</div>
-					<div class="col-md-12 graph-bottom-gap">
+					<div class="col-md-12 graph-bottom-gap" ng-show="showGraphs.bytes == true">
+						<p style="padding-top: 10px; text-align: center; font-size: 20px;">
+							Received:
+							<b style="color: green">{{rxParsed}}</b>
+							Sent:
+							<b style="color: green">{{txParsed}}</b>
+						</p>
 						<nvd3 options='bytesOptions' data='bytesData'></nvd3>
 					</div>
-					<div class="col-md-12 graph-bottom-gap">
+					<div class="col-md-12 graph-bottom-gap" ng-show="showGraphs.packets == true">
 						<nvd3 options='packetsOptions' data='packetsData'></nvd3>
 					</div>
-					<div class="col-md-6 graph-bottom-gap">
+					<div class="col-md-6 graph-bottom-gap" ng-show="showGraphs.dropped == true">
 						<nvd3 options='droppedOptions' data='droppedData'></nvd3>
 					</div>
-					<div class="col-md-6 graph-bottom-gap">
+					<div class="col-md-6 graph-bottom-gap" ng-show="showGraphs.error == true">
 						<nvd3 options='errorOptions' data='errorData'></nvd3>
 					</div>
 				</div>

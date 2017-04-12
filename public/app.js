@@ -6,6 +6,12 @@ dockerWatch.config(['$routeProvider',
 		.when('/', {
 			templateUrl: 'partials/home.html'
 		})
+		.when('/login', {
+			templateUrl: 'partials/login.html'
+		})
+		.when('/register', {
+			templateUrl: 'partials/register.html'
+		})
 		.when('/projects', {
 			templateUrl: 'partials/projects.html'
 		})
@@ -22,10 +28,64 @@ dockerWatch.config(['$routeProvider',
 			templateUrl: 'partials/container.html'
 		})
 		.otherwise({
-			redirectTo: "/"
+			redirectTo: "/projects"
 		})
 	}
 ])
+
+//Login
+dockerWatch.controller('LoginController', ["$scope", "LoginService", function($scope, LoginService){
+	$scope.username = ''
+	$scope.password = ''
+	$scope.login = function(){
+		console.log('LOGGING IN:', $scope.username, $scope.password)
+		var user = {
+			username: $scope.username,
+			password: $scope.password
+		}
+		login(user)
+		$scope.username = ''
+		$scope.password = ''
+
+	}
+}])
+
+dockerWatch.factory('LoginService', ["$http", function($http){
+	login = function(user){
+		console.log('Login service:', user)
+		$http.post('api/users/login/', user).then(function(res){
+			console.log('RETURNED:', res)
+		})
+	}
+}])
+
+//Register
+dockerWatch.controller('RegisterController', ["$scope", "RegisterService", function($scope, RegisterService){
+	$scope.name = ''
+	$scope.username = ''
+	$scope.password = ''
+	$scope.register = function(){
+		console.log('LOGGING IN:', $scope.username, $scope.password)
+		var user = {
+			name: $scope.name,
+			username: $scope.username,
+			password: $scope.password
+		}
+		register(user)
+		$scope.name = ''
+		$scope.username = ''
+		$scope.password = ''
+	}
+}])
+
+dockerWatch.factory('RegisterService', ["$http", function($http){
+	register = function(user){
+		console.log('Register service:', user)
+		$http.post('api/users/register/', user).then(function(res){
+			console.log('RETURNED:', res)
+		})
+	}
+}])
 
 //Home
 dockerWatch.controller('HomeController', ["$scope", "HomeService", "$route", "$timeout", function($scope, HomeService, $route, $timeout){
@@ -323,6 +383,14 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 	var containerId = split[1]
 	$scope.containerId = containerId
 	var mostRecentTime = 0
+	$scope.showGraphs = {
+		cpu: true,
+		mem: true,
+		bytes: true,
+		packets: true,
+		dropped: true,
+		error: true
+	}
 	function getStat(){
 		SingleContainerService.getStat(containerId).then(function(res){
 			if(Date.parse(res.values[0][0]) > mostRecentTime){
@@ -365,7 +433,7 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 				classed: 'dashed'
 			}
 		]
-		$scope.memBytes = parseMem(res.values[0][res.columns.indexOf('memBytes')])
+		$scope.memBytes = parseSize(res.values[0][res.columns.indexOf('memBytes')])
 		$scope.memPerc = res.values[0][res.columns.indexOf('memPerc')]
 		//Network
 		var rxBytes = parseInfluxData(res, res.columns.indexOf('rxBytes'))
@@ -380,6 +448,8 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 				key: 'Bytes sent'
 			}
 		]
+		$scope.rxParsed = parseSize(res.values[0][res.columns.indexOf('rxBytes')])
+		$scope.txParsed = parseSize(res.values[0][res.columns.indexOf('txBytes')])
 		var rxPackets = parseInfluxData(res, res.columns.indexOf('rxPackets'))
 		var txPackets = parseInfluxData(res, res.columns.indexOf('txPackets'))
 		$scope.packetsData = [
@@ -435,7 +505,7 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 		$scope.startedAt = parseTime(JSON.parse(res.values[0][columns.indexOf('state')]).StartedAt, 19)
 		$scope.subnetAddress = res.values[0][columns.indexOf('subnetAddress')]
 		$scope.lastUpdateFromCon = parseTime(res.values[0][columns.indexOf('time')], 19)
-		$scope.memLimit = (res.values[0][columns.indexOf('memLimit')] !== 0) ? parseMem(res.values[0][columns.indexOf('memLimit')]) : 'NA'
+		$scope.memLimit = (res.values[0][columns.indexOf('memLimit')] !== 0) ? parseSize(res.values[0][columns.indexOf('memLimit')]) : 'NA'
 		var currentTime = new Date()
 		$scope.lastUpdatedAt = currentTime.toUTCString()
 		$scope.$apply()
@@ -446,7 +516,7 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 	getStat()
 	getInfo()
 
-	function parseMem(mem){
+	function parseSize(mem){
 		var memVal = '0'
 		if(mem.toString().length < 7){
 			memVal = (mem / 1024).toFixed(2) + 'KB'

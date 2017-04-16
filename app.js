@@ -5,7 +5,7 @@ var mongoose = require('mongoose');
 var passport = require('passport');
 var yaml_config = require('node-yaml-config')
 var config = yaml_config.load(__dirname + '/config.yml')
-mongoose.connect('mongodb://' + config.mongodb + '/dockerwatch');
+mongoose.connect('mongodb://' + config.database + '/dockerwatch');
 
 require('./config/express').addMiddleware(app)
 require('./api/users/users.model')

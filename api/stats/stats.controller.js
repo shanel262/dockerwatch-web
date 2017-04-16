@@ -6,7 +6,7 @@ var HOST = '127.0.0.1'
 var PORT = 8001
 
 var influx = new influxdb({
-		host: config.influxdb,
+		host: config.database,
 		port: 8086,
 		username: 'root',
 		password: 'root',

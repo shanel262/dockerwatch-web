@@ -1,3 +1,2 @@
 default:
-  mongodb: 'localhost'
-  influxdb: 'localhost'
+  database: 'localhost'

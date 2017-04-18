@@ -32,17 +32,19 @@ dockerWatch.config(['$routeProvider',
 
 .run(function($rootScope, $location, LoginService){
 	$rootScope.$on('$routeChangeStart', function(event, nextRoute, currentRoute){
-		console.log('LOGGED IN USER:', $rootScope.loggedInUser)
 		var check = isLoggedIn()
+		console.log('LOGGED IN USER:', $rootScope.loggedInUser)
 		if(check){
-			console.log('Continue')
+			console.log('Continue', check)
+			if($location.path() == '/register'){
+				$location.path('/projects')
+			}
+			else if($location.path() == '/login'){
+				$location.path('/projects')
+			}
 		}
 		else{
-			console.log('Redirect')
-		}
-		// console.log('NEXTROUTE:', $location.path())
-		// console.log('CURRENTROUTE:', currentRoute.$$route.originalPath)
-		if($rootScope.loggedInUser == null){
+			console.log('No logged in user: Redirect')
 			if($location.path() != '/register'){
 				if($location.path() != '/login'){
 					$location.path('/login')
@@ -51,6 +53,16 @@ dockerWatch.config(['$routeProvider',
 		}
 	})
 })
+
+dockerWatch.controller('NavController', ["$scope", "$location", "$rootScope", function($scope, $location, $rootScope){
+	console.log('Loading NavController')
+	$scope.logout = function(){
+		console.log('Logout:', $rootScope.loggedInUser)
+		$rootScope.loggedInUser = null
+		window.localStorage.removeItem('token')
+		$location.path('/login')
+	}
+}])
 
 //Login
 dockerWatch.controller('LoginController', ["$scope", "LoginService", function($scope, LoginService){
@@ -69,7 +81,7 @@ dockerWatch.controller('LoginController', ["$scope", "LoginService", function($s
 	}
 }])
 
-dockerWatch.factory('LoginService', ["$http", "$location", function($http, $location){
+dockerWatch.factory('LoginService', ["$http", "$location", "$rootScope", function($http, $location, $rootScope){
 	login = function(user){
 		console.log('Login service:', user)
 		$http.post('api/users/login/', user).then(function(res){
@@ -83,9 +95,6 @@ dockerWatch.factory('LoginService', ["$http", "$location", function($http, $loca
 			}
 		})
 	}
-	logout = function(){
-		window.localStorage.removeItem('token')
-	}
 	isLoggedIn = function(){
 		var token = window.localStorage.getItem('token')
 		var payload
@@ -96,6 +105,11 @@ dockerWatch.factory('LoginService', ["$http", "$location", function($http, $loca
 			console.log('PAYLOAD:', payload)
 			if(payload.exp > Date.now() / 1000){
 				console.log('Valid token')
+				$rootScope.loggedInUser = {
+					id: payload._id,
+					name: payload.name,
+					username: payload.username
+				}
 				return true
 			}
 			else{
@@ -103,7 +117,10 @@ dockerWatch.factory('LoginService', ["$http", "$location", function($http, $loca
 				return false
 			}
 		}
-		else{console.log('NO TOKEN')}
+		else{
+			console.log('NO TOKEN')
+			return false
+		}
 	}
 }])
 

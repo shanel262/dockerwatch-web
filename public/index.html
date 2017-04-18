@@ -17,16 +17,17 @@
 
 </head>
 <!--Navbar-->
-<nav class="navbar navbar-inverse">
+<nav class="navbar navbar-inverse" ng-controller="NavController">
   <div class="container-fluid">
     <div class="navbar-header">
       <a class="navbar-brand" href="#/">DockerWatch</a>
     </div>
     <div>
       <ul class="nav navbar-nav">
-        <li><a href="#/projects">Projects</a></li>
-        <li><a href="#/login">Login</a></li>
-        <li><a href="#/register">Register</a></li>
+        <li><a href="#/projects" ng-if="loggedInUser != null">Projects</a></li>
+        <li><a href="#/login" ng-if="loggedInUser == null">Login</a></li>
+        <li><a href="#/register" ng-if="loggedInUser == null">Register</a></li>
+        <li><a class="btn" ng-click="logout()" ng-if="loggedInUser != null">Logout</a></li>
       </ul>
     </div>
   </div>

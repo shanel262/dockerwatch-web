@@ -54,6 +54,7 @@ dockerWatch.config(['$routeProvider',
 	})
 })
 
+//For Navbar
 dockerWatch.controller('NavController', ["$scope", "$location", "$rootScope", function($scope, $location, $rootScope){
 	console.log('Loading NavController')
 	$scope.logout = function(){
@@ -173,7 +174,7 @@ dockerWatch.controller('ProjectsController', ["$scope", "ProjectsService", "$tim
 					}
 				}
 				catch(err){
-					console.log('CANNOT READ CONTAINERS:', err)
+					// console.log('CANNOT READ CONTAINERS:', err)
 					var containers = []
 				}
 				var project = {
@@ -248,6 +249,7 @@ dockerWatch.controller('SingleProjectController', ["$scope", "SingleProjectServi
 		$scope.name = project.name
 		$scope.owner = project.owner
 		$scope.id = project._id
+		$scope.team = project.team
 		try{
 			$scope.containers = project.containers.split(';')
 			if($scope.containers.length == 1 && $scope.containers[0] == ""){
@@ -255,7 +257,7 @@ dockerWatch.controller('SingleProjectController', ["$scope", "SingleProjectServi
 			}
 		}
 		catch(err){
-			console.log('CANNOT READ CONTAINERS:', err)
+			// console.log('CANNOT READ CONTAINERS:', err)
 			$scope.containers = []
 		}
 		$scope.projectContainerConcat = []
@@ -371,6 +373,94 @@ dockerWatch.factory('SingleProjectService', ["$http", function($http){
 				return res
 			})
 		}
+	}
+}])
+
+dockerWatch.controller('AddUserToProjectController', ["$scope", "AddUserToProjectService", "$http", function($scope, AddUserToProjectService, $http){
+	$http({
+		method: 'GET',
+		url: '/api/users/getUsers'
+	})
+	.success(function(res){
+		$scope.users = []
+		var dontInclude = []
+		$scope.projectTeam = []
+		$scope.team.forEach(function(user){
+			dontInclude.push(user._id)
+		})
+		for(var user = 0; user < res.length; user++){	
+			if(!dontInclude.includes(res[user]._id)){
+				$scope.users.push(res[user])
+			}
+			else{
+				$scope.projectTeam.push(res[user])
+			}
+		}
+	})
+	.error(function(res){
+		console.log('Failed to get users:', res)
+	})
+
+	$scope.addUser = function(){
+		console.log('ADD USER:', $scope.add, $scope.write)
+		var users = []
+		Object.keys($scope.add).forEach(function(key){
+			if($scope.add[key] == true){
+				var user = {
+					_id: key,
+					permission: ($scope.write[key] == true) ? true : false
+				}
+				users.push(user)
+			}
+		})
+		var projectId = {id: $scope.id}
+		users.push(projectId)
+		console.log('users:', users)
+		if(users.length > 1){
+			addUser(users)
+		}
+	}
+	$scope.add = {}
+	$scope.write = {}
+
+	$scope.deleteUser = function(user){
+		console.log('DELETE USER:', user)
+		var userToDelete = {
+			_id: user,
+			projectId: $scope.id
+		}
+		deleteUser(userToDelete)
+	}
+}])
+
+dockerWatch.factory('AddUserToProjectService', ["$http", function($http){
+	addUser = function(users){
+		$http({
+			method: 'POST',
+			url: '/api/projects/addUsers',
+			data: users
+		})
+		.success(function(res){
+			console.log('Successfully added:', res)
+			window.location.reload()
+		})
+		.error(function(res){
+			console.log('Failed to add:', res)
+		})
+	}
+	deleteUser = function(user){
+		$http({
+			method: 'POST',
+			url: '/api/projects/deleteUser',
+			data: user
+		})
+		.success(function(res){
+			console.log('Successfully deleted:', res)
+			window.location.reload()
+		})
+		.error(function(res){
+			console.log('Failed to delete user:', res)
+		})
 	}
 }])
 

@@ -6,16 +6,61 @@
 				<div class="panel-body">
 					<form ng-submit="saveProject()">
 						<div class="form-group">
-							Name: <br>
+							<label>Name:</label> 
+							<br>
 							<input type="text" name="name" placeholder="Name" ng-model="name">
-						</div>
-						<div class="form-group">
-							Containers: <br>
-							<input type="text" name="conIds" placeholder="Container IDs split by ;" ng-model="containerString">
 						</div>
 						<button type="submit" class="btn btn-success">Submit</button>
 					</form>
+					TEAM: {{team}}
 				</div>						
+			</div>
+			<div ng-controller="AddUserToProjectController">
+				<div class="panel panel-primary">
+					<div class="panel-heading"><b>Project Team</b></div>
+					<div class="panel-body">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<td>Name</td>
+									<td>Username</td>
+									<td>Remove</td>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="user in projectTeam">
+									<td>{{user.name}}</td>
+									<td>{{user.username}}</td>
+									<td><button class="btn btn-xs btn-danger" ng-click="deleteUser(user._id)">Remove</button></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>						
+				</div>
+				<div class="panel panel-default">
+					<div class="panel-heading"><b>Add User</b></div>
+					<div class="panel-body">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<td>Name</td>
+									<td>Username</td>
+									<td>Select</td>
+									<td>Write permission</td>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="user in users">
+									<td>{{user.name}}</td>
+									<td>{{user.username}}</td>
+									<td><input type="checkbox" name="add" ng-model="add[user._id]" value="{{user._id}}"></td>
+									<td><input type="checkbox" name="write" ng-model="write[user._id]" value="{{user._id}}"></td>
+								</tr>
+							</tbody>
+						</table>
+						<button class="btn btn-block btn-success" ng-click="addUser()">Add</button>
+					</div>						
+				</div>
 			</div>
 		</div>
 	</div>

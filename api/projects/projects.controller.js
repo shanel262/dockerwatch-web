@@ -3,8 +3,7 @@ var moment = require('moment')
 var Project = require('./projects.model')
 var project = new Project()
 
-function handleError(err) {
-  console.log(err);
+function handleError(res, err) {
   return res.send(500, err);
 }
 
@@ -74,4 +73,36 @@ exports.deleteProject = function(req, res){
 	}
 	else{return res.json(400, "No project ID provided")}
 	
+}
+
+exports.addUsers = function(req, res){
+	console.log('AT addUsers API:', req.body)
+	var projectId = req.body.pop()
+	Project.findById(projectId.id, function(err, project){
+		if(err){handleError(res, err)}
+		else{
+			console.log('Found project:', project)
+			for(var user = 0; user < req.body.length; user++){
+				var add = {
+					_id: req.body[user]._id,
+					permission: req.body[user].permission
+				}
+				console.log('ADD:', user, add)
+				project.team.push(add)
+				if(user == req.body.length - 1){
+					project.save(function(err){
+						if(err){handleError(res, err)}
+						else{
+							console.log('Users added')
+							return res.send(200).json(project)
+						}
+					})
+				}
+			}
+		}
+	})
+}
+
+exports.deleteUser = function(req, res){
+	console.log('AT deleteUser API:', req.body)
 }

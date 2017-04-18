@@ -8,5 +8,7 @@ router.post('/newProject', controller.newProject) //Get stats for specific conta
 router.get('/:id', controller.getSingleProject) //Get a single project
 router.post('/editProject', controller.editProject) //Edit a single project
 router.delete('/deleteProject/:id', controller.deleteProject) //Delete a single project
+router.post('/addUsers', controller.addUsers)
+router.post('/deleteUser', controller.deleteUser)
 
 module.exports = router;

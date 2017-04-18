@@ -2,9 +2,9 @@ var passport = require('passport')
 var User = require('./users.model')
 
 
-function handleError(err) {
+function handleError(res, err) {
   console.log(err);
-  return res.send(500, err);
+  return res.status(500).json(err);
 }
 
 exports.login = function(req, res){
@@ -39,4 +39,15 @@ exports.register = function(req, res){
 		})
 	})
 	// return res.json(200, 'REGISTER API SUCCESS')
+}
+
+exports.getUsers = function(req, res){
+	console.log('AT getUsers API:', req.params)
+	User.find(function(err, users){
+		if(err){handleError(res, err)}
+		else{
+			console.log('Found users:', users)
+			return res.status(200).json(users)
+		}
+	})
 }

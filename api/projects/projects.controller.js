@@ -105,4 +105,13 @@ exports.addUsers = function(req, res){
 
 exports.deleteUser = function(req, res){
 	console.log('AT deleteUser API:', req.body)
+	Project.update({_id: req.body.projectId}, {$pull: {team: {_id: req.body._id}}}, {safe: true},
+		function(err, project){
+			if(err){handleError(res, err)}
+			else{
+				console.log('Removed user:', project)
+				return res.status(200).json(project)
+			}
+		}
+	)
 }

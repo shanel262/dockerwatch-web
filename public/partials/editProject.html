@@ -1,8 +1,11 @@
 <div class="container-fluid" ng-controller="SingleProjectController">
-	<div class="row">
+	<div class="row" ng-if="loggedInUser.permission == true">
 		<div class="col-md-8 col-md-offset-2">
 			<div class="panel panel-primary">
-				<div class="panel-heading"><b>Edit project</b></div>
+				<div class="panel-heading">
+					<a class="btn btn-sm btn-default" href="#/project/{{id}}">Back</a>
+					<b>Edit project</b>
+				</div>
 				<div class="panel-body">
 					<form ng-submit="saveProject()">
 						<div class="form-group">
@@ -12,7 +15,6 @@
 						</div>
 						<button type="submit" class="btn btn-success">Submit</button>
 					</form>
-					TEAM: {{team}}
 				</div>						
 			</div>
 			<div ng-controller="AddUserToProjectController">
@@ -24,6 +26,7 @@
 								<tr>
 									<td>Name</td>
 									<td>Username</td>
+									<td>Admin Permissions</td>
 									<td>Remove</td>
 								</tr>
 							</thead>
@@ -31,6 +34,8 @@
 								<tr ng-repeat="user in projectTeam">
 									<td>{{user.name}}</td>
 									<td>{{user.username}}</td>
+									<td ng-if="user.permission == true">Yes  |  <button class="btn btn-xs btn-danger">Remove</button></td>
+									<td ng-if="user.permission == false">No  |  <button class="btn btn-xs btn-success">Assign</button></td>
 									<td><button class="btn btn-xs btn-danger" ng-click="deleteUser(user._id)">Remove</button></td>
 								</tr>
 							</tbody>
@@ -46,7 +51,7 @@
 									<td>Name</td>
 									<td>Username</td>
 									<td>Select</td>
-									<td>Write permission</td>
+									<td>Admin</td>
 								</tr>
 							</thead>
 							<tbody>

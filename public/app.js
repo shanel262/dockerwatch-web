@@ -239,7 +239,7 @@ dockerWatch.factory('NewProjectsService', ["$http", function($http){
 }])
 
 //Single project
-dockerWatch.controller('SingleProjectController', ["$scope", "SingleProjectService", "$routeParams", "$http", "$timeout", "$location", "$window", "$route", function($scope, SingleProjectService, $routeParams, $http, $timeout, $location, $window, $route){
+dockerWatch.controller('SingleProjectController', ["$scope", "SingleProjectService", "$routeParams", "$http", "$timeout", "$location", "$window", "$route", "$rootScope", function($scope, SingleProjectService, $routeParams, $http, $timeout, $location, $window, $route, $rootScope){
 	$http.get('/api/projects/' + $routeParams.projectID).success(function(project){
 		console.log('RESPONSE1:', project)
 		var utcTime = dateFromObjectID(project._id)
@@ -250,6 +250,12 @@ dockerWatch.controller('SingleProjectController', ["$scope", "SingleProjectServi
 		$scope.owner = project.owner
 		$scope.id = project._id
 		$scope.team = project.team
+		$scope.team.forEach(function(user){
+			if(user._id == $rootScope.loggedInUser.id){
+				$rootScope.loggedInUser.permission = user.permission
+				console.log('found it:', $scope.loggedInUser.permission)
+			}
+		})
 		try{
 			$scope.containers = project.containers.split(';')
 			if($scope.containers.length == 1 && $scope.containers[0] == ""){
@@ -393,6 +399,11 @@ dockerWatch.controller('AddUserToProjectController', ["$scope", "AddUserToProjec
 				$scope.users.push(res[user])
 			}
 			else{
+				var search = res[user]._id
+				var obj = $scope.team.filter(function(obj){
+					return obj._id === search
+				})
+				res[user].permission = obj[0].permission
 				$scope.projectTeam.push(res[user])
 			}
 		}

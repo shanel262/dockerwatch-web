@@ -3,9 +3,6 @@ var dockerWatch = angular.module('DockerWatch', ['ngRoute', 'nvd3']);
 dockerWatch.config(['$routeProvider',
 	function($routeProvider){
 		$routeProvider
-		.when('/', {
-			templateUrl: 'partials/home.html'
-		})
 		.when('/login', {
 			templateUrl: 'partials/login.html'
 		})
@@ -33,6 +30,28 @@ dockerWatch.config(['$routeProvider',
 	}
 ])
 
+.run(function($rootScope, $location, LoginService){
+	$rootScope.$on('$routeChangeStart', function(event, nextRoute, currentRoute){
+		console.log('LOGGED IN USER:', $rootScope.loggedInUser)
+		var check = isLoggedIn()
+		if(check){
+			console.log('Continue')
+		}
+		else{
+			console.log('Redirect')
+		}
+		// console.log('NEXTROUTE:', $location.path())
+		// console.log('CURRENTROUTE:', currentRoute.$$route.originalPath)
+		if($rootScope.loggedInUser == null){
+			if($location.path() != '/register'){
+				if($location.path() != '/login'){
+					$location.path('/login')
+				}
+			}
+		}
+	})
+})
+
 //Login
 dockerWatch.controller('LoginController', ["$scope", "LoginService", function($scope, LoginService){
 	$scope.username = ''
@@ -54,15 +73,37 @@ dockerWatch.factory('LoginService', ["$http", "$location", function($http, $loca
 	login = function(user){
 		console.log('Login service:', user)
 		$http.post('api/users/login/', user).then(function(res){
-			console.log('RETURNED:', res)
 			if(res.status == 200){
-				console.log('SUCCESSFUL LOGIN')
+				console.log('SUCCESSFUL LOGIN', res)
+				window.localStorage.setItem('token', res.data.token)
 				$location.path('/projects')
 			}
 			else if(res.status == 401 || res.status == 404){
 				console.log('FAILED LOGIN', res)
 			}
 		})
+	}
+	logout = function(){
+		window.localStorage.removeItem('token')
+	}
+	isLoggedIn = function(){
+		var token = window.localStorage.getItem('token')
+		var payload
+		if(token){
+			payload = token.split('.')[1]
+			payload = window.atob(payload)
+			payload = JSON.parse(payload)
+			console.log('PAYLOAD:', payload)
+			if(payload.exp > Date.now() / 1000){
+				console.log('Valid token')
+				return true
+			}
+			else{
+				console.log('Invalid token')
+				return false
+			}
+		}
+		else{console.log('NO TOKEN')}
 	}
 }])
 
@@ -98,80 +139,6 @@ dockerWatch.factory('RegisterService', ["$http", "$location", function($http, $l
 				console.log('FAILED REGISTRATION', res)
 			}
 		})
-	}
-}])
-
-//Home
-dockerWatch.controller('HomeController', ["$scope", "HomeService", "$route", "$timeout", function($scope, HomeService, $route, $timeout){
-	var containerId = "098"
-	var mostRecentTime = 0
-	function getStat(){
-		HomeService.getStat(containerId).then(function(res){
-			if(Date.parse(res.values[0][0]) > mostRecentTime){
-				update(res)
-				mostRecentTime = Date.parse(res.values[0][0])
-			}
-		})		
-	}
-
-	function update(res){
-		$scope.name = res.name
-		var time = res.values[0][0]
-		$scope.date = time.substring(0, 10)
-		$scope.time = time.substring(11, 25)
-		$scope.cpu = res.values[0][1]
-		$scope.mem = res.values[0][2]
-		$scope.data = [
-			{
-				key: "Used",
-				y: res.values[0][1]
-			},
-			{
-				key: "Free",
-				y: 100 - res.values[0][1]
-			}
-		]
-		$scope.$apply()
-		console.log('UPDATING STATS', res)
-		$timeout(function(){
-			getStat()
-		}, 1000)
-	}
-	getStat()
-
-	$scope.options = {
-		chart: {
-                type: 'pieChart',
-                height: 500,
-                x: function(d){return d.key;},
-                y: function(d){return d.y;},
-                showLabels: true,
-                duration: 500,
-                labelThreshold: 0.01,
-                labelSunbeamLayout: true,
-                legend: {
-                    margin: {
-                        top: 5,
-                        right: 35,
-                        bottom: 5,
-                        left: 0
-                    }
-                }
-            }
-	};
-}])
-
-dockerWatch.factory('HomeService', ["$location", "$http", function($location, $http){
-	return {
-		getStat: function(containerId){
-			return $http.get('api/stats/getStat/' + containerId)
-			.then(function(response){
-				var stats = Promise.resolve(response).then(function(v){
-					return v.data
-				})
-				return stats
-			})
-		}
 	}
 }])
 

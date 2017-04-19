@@ -15,12 +15,12 @@ exports.getProjects = function(req, res){
 }
 
 exports.newProject = function(req, res){
+	console.log('AT newProject API:', req.body)
 	req.sanitize('name').escape()
-	req.sanitize('conIds').escape()
 	var project = {
 		name: req.body.name,
-		containers: req.body.conIds,
-		owner: 'shanel262'
+		owner: req.body.user.username,
+		team: [{_id: req.body.user.id, permission: true}]
 	}
 	Project.create(project, function(err, response){
 		if(err){return handleError(err)}

@@ -211,26 +211,30 @@ dockerWatch.factory('ProjectsService', ["$http", function($http){
 
 
 //New Projects
-dockerWatch.controller('NewProjectsController', ["$scope", "NewProjectsService", "$location", function($scope, NewProjectsService, $location){
+dockerWatch.controller('NewProjectsController', ["$scope", "NewProjectsService", "$rootScope", function($scope, NewProjectsService, $rootScope){
 	$scope.addNewProject = function(){
-		if($scope.conIds == ""){
-			$scope.conIds = undefined //If user types in conIds form but leaves it empty, it created an empty string
-		}
 		var project = {
 			name: $scope.name,
-			conIds: $scope.conIds
+			user: $rootScope.loggedInUser
 		}
 		createProject(project)
 		$scope.name = ""
-		$scope.conIds = ""
-		$location.path('/projects')
 	}
 }])
 
-dockerWatch.factory('NewProjectsService', ["$http", function($http){
+dockerWatch.factory('NewProjectsService', ["$http", "$location", function($http, $location){
 	createProject = function(project){
-		$http.post('api/projects/newProject/', project).then(function(res){
-			console.log('RETURNED:', res)
+		$http({
+			method: 'POST',
+			url: 'api/projects/newProject/',
+			data: project
+		})
+		.success(function(res){
+			console.log('Successfully added project:', res)
+			$location.path('/projects')
+		})
+		.error(function(res){
+			console.log('Failed to add project:', res)
 		})
 	}
 	// return {

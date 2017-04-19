@@ -10,7 +10,7 @@ var influx = new influxdb({
 		port: 8086,
 		username: 'root',
 		password: 'root',
-		database: 'test'
+		database: 'dockerwatch'
 	})
 
 exports.getStat = function(req, res){

@@ -8,9 +8,13 @@ function handleError(res, err) {
 }
 
 exports.getProjects = function(req, res){
-	Project.find({}, function(err, projects){
+	console.log('AT getProjects API:', req.params.userId)
+	Project.find({'team._id': req.params.userId}, function(err, projects){
 		if(err){return handleError(err)}
-		return res.json(200, projects)
+		else{
+			console.log('Found projects:', projects)
+			return res.status(200).json(projects)
+		}
 	})
 }
 
@@ -114,4 +118,17 @@ exports.deleteUser = function(req, res){
 			}
 		}
 	)
+}
+
+exports.changePerm = function(req, res){
+	console.log('AT changePerm API:', req.body)
+	Project.update({_id: req.body.projectId, 'team._id': req.body.userId}, 
+		{$set: {'team.$.permission': req.body.permission}}, 
+		function(err, project){
+			if(err){handleError(res, err)}
+			else{
+				console.log('Updated permission:', project)
+				return res.status(200).json(project)
+			}
+	})
 }

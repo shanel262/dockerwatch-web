@@ -161,10 +161,10 @@ dockerWatch.factory('RegisterService', ["$http", "$location", function($http, $l
 }])
 
 //Projects
-dockerWatch.controller('ProjectsController', ["$scope", "ProjectsService", "$timeout", "$location", function($scope, ProjectsService, $timeout, $location){
+dockerWatch.controller('ProjectsController', ["$scope", "ProjectsService", "$timeout", "$location", "$rootScope", function($scope, ProjectsService, $timeout, $location, $rootScope){
 	$scope.projects = []
 	function getProjects(){
-		ProjectsService.getProjects().then(function(res){
+		ProjectsService.getProjects($rootScope.loggedInUser.id).then(function(res){
 			var projects = []
 			for (projectIndex in res.data){
 				try{
@@ -174,7 +174,6 @@ dockerWatch.controller('ProjectsController', ["$scope", "ProjectsService", "$tim
 					}
 				}
 				catch(err){
-					// console.log('CANNOT READ CONTAINERS:', err)
 					var containers = []
 				}
 				var project = {
@@ -199,11 +198,18 @@ dockerWatch.controller('ProjectsController', ["$scope", "ProjectsService", "$tim
 
 dockerWatch.factory('ProjectsService', ["$http", function($http){
 	return {
-		getProjects: function(){
-			return $http.get('api/projects/getProjects/')
-			.then(function(response){
-				console.log('RESPONSE:', response)
-				return response
+		getProjects: function(userId){
+			return $http({
+				method: 'GET',
+				url: 'api/projects/getProjects/' + userId
+			})
+			.success(function(res){
+				console.log('Successfully retrieved projects:', res)
+				return res
+			})
+			.error(function(res){
+				console.log('Failed to get projects:', res)
+				return res
 			})
 		}
 	}
@@ -446,6 +452,22 @@ dockerWatch.controller('AddUserToProjectController', ["$scope", "AddUserToProjec
 		}
 		deleteUser(userToDelete)
 	}
+
+	$scope.changePerm = function(user){
+		console.log('CHANGE PERM:', user)
+		var projAndPerm = {
+			projectId: $scope.id,
+			userId: user._id
+		}
+		if(user.permission == true){
+			projAndPerm.permission = false
+		}
+		else{
+			projAndPerm.permission = true
+		}
+		console.log('projAndPerm:', projAndPerm)
+		changePerm(projAndPerm)
+	}
 }])
 
 dockerWatch.factory('AddUserToProjectService', ["$http", function($http){
@@ -475,6 +497,20 @@ dockerWatch.factory('AddUserToProjectService', ["$http", function($http){
 		})
 		.error(function(res){
 			console.log('Failed to delete user:', res)
+		})
+	}
+	changePerm = function(projAndPerm){
+		$http({
+			method: 'POST',
+			url: '/api/projects/changePerm',
+			data: projAndPerm
+		})
+		.success(function(res){
+			console.log('Successfully changed permission:', res)
+			window.location.reload()
+		})
+		.error(function(res){
+			console.log('Failed to change permission', res)
 		})
 	}
 }])

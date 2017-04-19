@@ -21,6 +21,8 @@
 				<div class="panel panel-primary">
 					<div class="panel-heading"><b>Project Team</b></div>
 					<div class="panel-body">
+						<input class="form-control" placeholder="Search" type="text" name="searchProjectTeam" ng-model="searchProjectTeam">
+						<br>
 						<table class="table table-bordered table-striped">
 							<thead>
 								<tr>
@@ -31,11 +33,11 @@
 								</tr>
 							</thead>
 							<tbody>
-								<tr ng-repeat="user in projectTeam">
+								<tr ng-repeat="user in projectTeam | filter:searchProjectTeam">
 									<td>{{user.name}}</td>
 									<td>{{user.username}}</td>
-									<td ng-if="user.permission == true">Yes  |  <button class="btn btn-xs btn-danger">Remove</button></td>
-									<td ng-if="user.permission == false">No  |  <button class="btn btn-xs btn-success">Assign</button></td>
+									<td ng-if="user.permission == true">Yes  |  <button class="btn btn-xs btn-danger" ng-click="changePerm(user)">Remove</button></td>
+									<td ng-if="user.permission == false">No  |  <button class="btn btn-xs btn-success" ng-click="changePerm(user)">Assign</button></td>
 									<td><button class="btn btn-xs btn-danger" ng-click="deleteUser(user._id)">Remove</button></td>
 								</tr>
 							</tbody>
@@ -45,6 +47,8 @@
 				<div class="panel panel-default">
 					<div class="panel-heading"><b>Add User</b></div>
 					<div class="panel-body">
+						<input class="form-control" placeholder="Search" type="text" name="searchAddUser" ng-model="searchAddUser">
+						<br>
 						<table class="table table-bordered table-striped">
 							<thead>
 								<tr>
@@ -55,7 +59,7 @@
 								</tr>
 							</thead>
 							<tbody>
-								<tr ng-repeat="user in users">
+								<tr ng-repeat="user in users | filter:searchAddUser">
 									<td>{{user.name}}</td>
 									<td>{{user.username}}</td>
 									<td><input type="checkbox" name="add" ng-model="add[user._id]" value="{{user._id}}"></td>

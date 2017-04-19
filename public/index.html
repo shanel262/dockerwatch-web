@@ -27,7 +27,9 @@
         <li><a href="#/projects" ng-if="loggedInUser != null">Projects</a></li>
         <li><a href="#/login" ng-if="loggedInUser == null">Login</a></li>
         <li><a href="#/register" ng-if="loggedInUser == null">Register</a></li>
-        <li><a class="btn" ng-click="logout()" ng-if="loggedInUser != null">Logout</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a class="btn" ng-click="logout()" ng-if="loggedInUser != null">{{loggedInUser.username}} - Logout</a></li>
       </ul>
     </div>
   </div>
@@ -35,7 +37,7 @@
 <!--Navbar end-->
 <body>
   <div class="container-fluid">
-    <div ng-view ></div>         
+    <div ng-view ></div>
   </div>
   <script src="app.js"></script>
 </body>

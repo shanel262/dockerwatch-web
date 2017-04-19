@@ -43,7 +43,9 @@ exports.register = function(req, res){
 
 exports.getUsers = function(req, res){
 	console.log('AT getUsers API:', req.params)
-	User.find(function(err, users){
+	User.find()
+		.select('name username')
+		.exec(function(err, users){
 		if(err){handleError(res, err)}
 		else{
 			console.log('Found users:', users)

@@ -103,14 +103,13 @@ dockerWatch.factory('LoginService', ["$http", "$location", "$rootScope", functio
 			payload = token.split('.')[1]
 			payload = window.atob(payload)
 			payload = JSON.parse(payload)
-			console.log('PAYLOAD:', payload)
 			if(payload.exp > Date.now() / 1000){
-				console.log('Valid token')
 				$rootScope.loggedInUser = {
 					id: payload._id,
 					name: payload.name,
 					username: payload.username
 				}
+				console.log('Valid token', $rootScope.loggedInUser)
 				return true
 			}
 			else{
@@ -516,7 +515,7 @@ dockerWatch.factory('AddUserToProjectService', ["$http", function($http){
 }])
 
 //Single Container View
-dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerService", "$route", "$timeout", "$routeParams", "$http", "$window", "$location", function($scope, SingleContainerService, $route, $timeout, $routeParams, $http, $window, $location){
+dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerService", "$route", "$timeout", "$routeParams", "$http", "$window", "$location", "$rootScope", function($scope, SingleContainerService, $route, $timeout, $routeParams, $http, $window, $location, $rootScope){
 	var split = $routeParams.containerID.split('.')
 	var projectId = split[0]
 	var containerId = split[1]
@@ -936,6 +935,12 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 			$scope.projectContainerConcat.push(project._id + '.' + $scope.containers[i])
 		}
 		$scope.containerString = project.containers
+		$scope.team = project.team
+		$scope.team.forEach(function(user){
+			if(user._id == $rootScope.loggedInUser.id){
+				$scope.permission = user.permission
+			}
+		})
 	})
 	.error(function(data, status, headers, config){
 		console.log('ERROR:', status, ':' ,data)

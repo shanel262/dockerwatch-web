@@ -52,7 +52,7 @@
 		</div>
 		<div class="col-md-8">
 			<div class="panel panel-primary">
-				<div class="panel-heading"><b>Container ID: {{containerId}}  </b><a ng-click="deleteContainer()" class="btn btn-danger btn-sm">Delete</a></div>
+				<div class="panel-heading"><b>Container ID: {{containerId}}  </b><a ng-click="deleteContainer()" class="btn btn-danger btn-sm" ng-if="permission == true">Delete</a></div>
 				<div class="panel-body">
 					<div class="dropdown" style="padding-bottom: 5px">
 						<button class="btn btn-warning dropdown-toggle" type="button" data-toggle="dropdown">Show Graphs <span class="caret"></span></button>

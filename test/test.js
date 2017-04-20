@@ -34,7 +34,6 @@ describe('Users', function(){
 	before(function(done){
 		mongoose.connection.dropDatabase()
 		setTimeout(function(){
-			console.log('INSERTING USER')
 			mongoose.connection.collection('users').insert(newUser)
 			done()
 		}, 10)
@@ -53,7 +52,7 @@ describe('Users', function(){
 			.end(function(err, res){
 				if(err){done(err)}
 				else{
-					console.log('RES:', res.body)
+					// console.log('RES:', res.body)
 					expect(err).to.be.null
 					expect(res.body.token).to.not.be.null
 					done()
@@ -63,7 +62,7 @@ describe('Users', function(){
 	})
 
 	describe('Login', function(){
-		it('should succeed', function(done){
+		it('should succeed with correct username and password', function(done){
 			var user = {
 				username: 'shanel262',
 				password: 'password'
@@ -72,21 +71,53 @@ describe('Users', function(){
 			.post('/api/users/login')
 			.send(user)
 			.end(function(err, res){
-				console.log('RES:', res.body)
 				expect(err).to.be.null
-				expect(res.body).to.not.be.null
 				expect(res.status).to.equal(200)
+				done()
+			})
+		})
+
+		it('should fail with wrong password', function(done){
+			var wrongPass = {
+				username: 'shanel262',
+				password: 'wrongpass'
+			}
+			chai.request(app)
+			.post('/api/users/login')
+			.send(wrongPass)
+			.end(function(err, res){
+				expect(err).to.not.be.null
+				expect(res.status).to.equal(401)
+				done()
+			})
+		})
+
+		it('should fail with wrong username', function(done){
+			var wrongUsername = {
+				username: 'wronguser',
+				password: 'password'
+			}
+			chai.request(app)
+			.post('/api/users/login')
+			.send(wrongUsername)
+			.end(function(err, res){
+				expect(err).to.not.be.null
+				expect(res.status).to.equal(400)
 				done()
 			})
 		})
 	})
 
-	// describe('Get all users', function(){
-	// 	before(function(done){
-	// 		mongoose.connection.dropDatabase()
-	// 		var user1 = {name: 'User1', username: 'user1', password: 'password'}
-	// 		var user2 = {name: 'User2', username: 'user2', password: 'password'}
-	// 		mongoose.connection.collections('users').insert(user1)
-	// 	})
-	// })
+	describe('Getting all users', function(){
+		it('should get all users', function(done){
+			chai.request(app)
+			.get('/api/users/getUsers')
+			.end(function(err, res){
+				expect(err).to.be.null
+				expect(res.status).to.equal(200)
+				expect(res.body.length).to.equal(2)
+				done()
+			})
+		})		
+	})
 })

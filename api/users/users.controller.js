@@ -3,8 +3,8 @@ var User = require('./users.model')
 
 
 function handleError(res, err) {
-  console.log(err);
-  return res.status(500).json(err);
+	console.log(err);
+	return res.status(500).json(err);
 }
 
 exports.login = function(req, res){
@@ -30,13 +30,18 @@ exports.register = function(req, res){
 	user.name = req.body.name,
 	user.username = req.body.username
 	user.setPassword(req.body.password)
-	user.save(function(err){
-		var token
-		token = user.generateJwt()
-		res.status(200)
-		res.json({
-			"token": token
-		})
+	user.save(function(err, response){
+		// console.log('err api:', err)
+		// console.log('response api:', response.body)
+		if(err){handleError(res, err)}
+		else{
+			var token
+			token = user.generateJwt()
+			res.status(200)
+			res.json({
+				"token": token
+			})			
+		}
 	})
 }
 

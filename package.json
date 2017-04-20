@@ -1,10 +1,10 @@
 {
   "name": "dockerwatch-web",
   "version": "1.0.0",
-  "description": "Web UI for DockerWatch and it also interacts with InfluxDB.",
+  "description": "Web UI for DockerWatch and it also interacts with InfluxDB and MongoDB.",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha test/test.js",
     "start": "node app.js"
   },
   "author": "Shane Lacey",
@@ -26,5 +26,10 @@
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
     "uuid": "3.0.1"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-http": "^3.0.0",
+    "mocha": "^3.2.0"
   }
 }

@@ -38,11 +38,9 @@ exports.register = function(req, res){
 			"token": token
 		})
 	})
-	// return res.json(200, 'REGISTER API SUCCESS')
 }
 
 exports.getUsers = function(req, res){
-	console.log('AT getUsers API:', req.params)
 	User.find()
 		.select('name username')
 		.exec(function(err, users){

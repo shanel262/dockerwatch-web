@@ -2,9 +2,10 @@ var uuid = require('uuid/v4') //Probably don't need this anymore
 var moment = require('moment')
 var Project = require('./projects.model')
 var project = new Project()
+var jwt = require('jwt-simple');
 
 function handleError(res, err) {
-  return res.send(500, err);
+  return res.status(500).json(err);
 }
 
 exports.getProjects = function(req, res){
@@ -20,16 +21,18 @@ exports.getProjects = function(req, res){
 
 exports.newProject = function(req, res){
 	console.log('AT newProject API:', req.body)
+	var token = req.headers.authorization.substring(11) //.token.substring(4)
+	var decoded = jwt.decode(token, 'MY_SECRET');
 	req.sanitize('name').escape()
 	var project = {
 		name: req.body.name,
-		owner: req.body.user.username,
-		team: [{_id: req.body.user.id, permission: true}]
+		owner: decoded.username,
+		team: [{_id: decoded._id, permission: true}]
 	}
 	Project.create(project, function(err, response){
-		if(err){return handleError(err)}
+		if(err){return handleError(res, err)}
 		console.log('Project created:', response)
-		return res.json(201, response)
+		return res.status(201).json(response)
 	})
 }
 

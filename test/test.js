@@ -3,8 +3,10 @@
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
+var validator = require('express-validator')
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(validator())
 require('../routes')(app)
 
 //setup chai and chai-http
@@ -29,6 +31,8 @@ var newUser = {
 	"password" : "password"
 }
 
+var userToken = null
+
 describe('Users', function(){
 
 	before(function(done){
@@ -50,13 +54,9 @@ describe('Users', function(){
 			.post('/api/users/register')
 			.send(user)
 			.end(function(err, res){
-				if(err){done(err)}
-				else{
-					// console.log('RES:', res.body)
-					expect(err).to.be.null
-					expect(res.body.token).to.not.be.null
-					done()
-				}
+				expect(err).to.be.null
+				expect(res.body).to.not.be.null
+				done()
 			})
 		})
 	})
@@ -73,6 +73,8 @@ describe('Users', function(){
 			.end(function(err, res){
 				expect(err).to.be.null
 				expect(res.status).to.equal(200)
+				expect(res.body.token).to.not.be.null
+				userToken = res.body.token
 				done()
 			})
 		})
@@ -119,5 +121,48 @@ describe('Users', function(){
 				done()
 			})
 		})		
+	})
+})
+
+describe('Projects API', function(){
+	// before(function(done){
+	// 	mongoose.connection.collection('projects').drop()
+	// 	done()
+	// })
+
+	describe('New project', function(){
+		it('should create a new project', function(done){
+			var newProject = {
+				name: 'Test new project',
+				username: 'New project owner'
+			}
+			console.log('TOKEN:', userToken)
+			chai.request(app)
+			.post('/api/projects/newProject')
+			.set('Authorization', 'Bearer ' + userToken)
+			.send(newProject)
+			.end(function(err, res){
+				expect(err).to.be.null
+				expect(res.status).to.equal(201)
+				expect(res.body).to.not.be.null
+				done()
+			})
+		})
+
+		it('should fail with incorrect token', function(done){
+			var newProject = {
+				name: 'Test new project',
+				username: 'New project owner'
+			}
+			chai.request(app)
+			.post('/api/projects/newProject')
+			.set('Authorization', 'Bearer ' + null)
+			.send(newProject)
+			.end(function(err, res){
+				expect(err).to.not.be.null
+				expect(res.status).to.equal(500)
+				done()
+			})
+		})
 	})
 })

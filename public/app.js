@@ -119,6 +119,14 @@ dockerWatch.factory('LoginService', ["$http", "$location", "$rootScope", functio
 			return false
 		}
 	}
+	getToken = function(){
+		if(window.localStorage.getItem('token')){
+			return window.localStorage.getItem('token')
+		}
+	}
+	return {
+		getToken: getToken
+	}
 }])
 
 //Register
@@ -224,11 +232,14 @@ dockerWatch.controller('NewProjectsController', ["$scope", "NewProjectsService",
 	}
 }])
 
-dockerWatch.factory('NewProjectsService', ["$http", "$location", function($http, $location){
+dockerWatch.factory('NewProjectsService', ["$http", "$location", "LoginService", function($http, $location, LoginService){
 	createProject = function(project){
 		$http({
 			method: 'POST',
 			url: 'api/projects/newProject/',
+			headers: {
+				Authorization: 'Bearer '+ LoginService.getToken()
+			},
 			data: project
 		})
 		.success(function(res){

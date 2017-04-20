@@ -88,8 +88,10 @@ dockerWatch.factory('LoginService', ["$http", "$location", "$rootScope", functio
 		$http.post('api/users/login/', user).then(function(res){
 			if(res.status == 200){
 				console.log('SUCCESSFUL LOGIN', res)
-				window.localStorage.setItem('token', res.data.token)
-				$location.path('/projects')
+				if(res.data.token != "undefined"){
+					window.localStorage.setItem('token', res.data.token)
+					$location.path('/projects')
+				}
 			}
 			else if(res.status == 401 || res.status == 404){
 				console.log('FAILED LOGIN', res)
@@ -99,23 +101,18 @@ dockerWatch.factory('LoginService', ["$http", "$location", "$rootScope", functio
 	isLoggedIn = function(){
 		var token = window.localStorage.getItem('token')
 		var payload
-		if(token){
+		console.log('TOKEN:', token)
+		if(token != 'undefined'){
 			payload = token.split('.')[1]
 			payload = window.atob(payload)
 			payload = JSON.parse(payload)
-			if(payload.exp > Date.now() / 1000){
-				$rootScope.loggedInUser = {
-					id: payload._id,
-					name: payload.name,
-					username: payload.username
-				}
-				console.log('Valid token', $rootScope.loggedInUser)
-				return true
+			$rootScope.loggedInUser = {
+				id: payload._id,
+				name: payload.name,
+				username: payload.username
 			}
-			else{
-				console.log('Invalid token')
-				return false
-			}
+			console.log('Valid token', $rootScope.loggedInUser)
+			return true
 		}
 		else{
 			console.log('NO TOKEN')

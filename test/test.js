@@ -24,10 +24,9 @@ mongoose.connect('mongodb://' + config.database + '/test')
 var Users = require('../api/users/users.controller')
 
 var newUser = {
-	"hash" : "a472a1871cfe5e0319226d883b5d6ea25997acbd19cd936a92fa20ae3eaef19ef03710f58650d1757771336c8f3efac3cb73c84037c646bd301cc4414628d8b8",
-	"salt" : "f44f13525ce744981494031ecd01db5c",
 	"username" : "jtest",
-	"name" : "John Test"
+	"name" : "John Test",
+	"password" : "password"
 }
 
 describe('Users', function(){
@@ -54,6 +53,7 @@ describe('Users', function(){
 			.end(function(err, res){
 				if(err){done(err)}
 				else{
+					console.log('RES:', res.body)
 					expect(err).to.be.null
 					expect(res.body.token).to.not.be.null
 					done()
@@ -65,14 +65,14 @@ describe('Users', function(){
 	describe('Login', function(){
 		it('should succeed', function(done){
 			var user = {
-				username: 'jtest',
+				username: 'shanel262',
 				password: 'password'
 			}
 			chai.request(app)
 			.post('/api/users/login')
 			.send(user)
 			.end(function(err, res){
-				console.log('RES:', res)
+				console.log('RES:', res.body)
 				expect(err).to.be.null
 				expect(res.body).to.not.be.null
 				expect(res.status).to.equal(200)

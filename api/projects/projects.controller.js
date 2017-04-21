@@ -98,7 +98,7 @@ exports.deleteProject = function(req, res){
 }
 
 exports.addUsers = function(req, res){
-	console.log('AT addUsers API:', req.body)
+	// console.log('AT addUsers API:', req.body)
 	var token = req.headers.authorization.substring(11)
 	var decoded = jwt.decode(token, 'MY_SECRET');
 	var projectId = req.body.pop()
@@ -111,7 +111,6 @@ exports.addUsers = function(req, res){
 					_id: req.body[user]._id,
 					permission: req.body[user].permission
 				}
-				console.log('ADD:', user, add)
 				project.team.push(add)
 				if(user == req.body.length - 1){
 					project.save(function(err){
@@ -128,7 +127,7 @@ exports.addUsers = function(req, res){
 }
 
 exports.deleteUser = function(req, res){
-	console.log('AT deleteUser API:', req.body)
+	// console.log('AT deleteUser API:', req.body)
 	var token = req.headers.authorization.substring(11)
 	var decoded = jwt.decode(token, 'MY_SECRET');
 	Project.update({_id: req.body.projectId}, {$pull: {team: {_id: req.body._id}}}, {safe: true},
@@ -146,7 +145,7 @@ exports.deleteUser = function(req, res){
 }
 
 exports.changePerm = function(req, res){
-	console.log('AT changePerm API:', req.body)
+	// console.log('AT changePerm API:', req.body)
 	var token = req.headers.authorization.substring(11)
 	var decoded = jwt.decode(token, 'MY_SECRET');
 	Project.update({_id: req.body.projectId, 'team._id': req.body.userId}, 

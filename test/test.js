@@ -78,7 +78,6 @@ describe('Users', function(){
 			.post('/api/users/register')
 			.send(user)
 			.end(function(err, res){
-				console.log('RES:', err, res.body, res.status)
 				expect(err).to.not.be.null
 				expect(res.status).to.equal(400)
 				done()
@@ -95,7 +94,6 @@ describe('Users', function(){
 			.post('/api/users/register')
 			.send(user)
 			.end(function(err, res){
-				console.log('RES:', err, res.body, res.status)
 				expect(err).to.not.be.null
 				expect(res.status).to.equal(400)
 				done()
@@ -178,7 +176,6 @@ describe('Projects API', function(){
 				name: 'Test new project',
 				username: 'New project owner'
 			}
-			console.log('TOKEN:', userToken)
 			chai.request(app)
 			.post('/api/projects/newProject')
 			.set('Authorization', 'Bearer ' + userToken)
@@ -607,7 +604,6 @@ describe('Projects API', function(){
 			.delete('/api/projects/deleteProject/' + '58f7b54c1c5d645c84c749b7')
 			.set('Authorization', 'Bearer ' + userToken)
 			.end(function(err, res){
-				console.log('BACK')
 				expect(err).to.be.null
 				expect(res.status).to.equal(200)
 				expect(res.body.n).to.equal(1)

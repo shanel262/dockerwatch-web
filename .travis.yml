@@ -6,3 +6,14 @@ services:
 
 node_js:
   - "6"
+
+addons: 
+  apt: 
+    sources: 
+    - ubuntu-toolchain-r-test 
+    packages: 
+    - gcc-4.8 
+    - g++-4.8
+
+env:
+  - CXX=g++-4.8

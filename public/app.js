@@ -200,12 +200,15 @@ dockerWatch.controller('ProjectsController', ["$scope", "ProjectsService", "$tim
 	}
 }])
 
-dockerWatch.factory('ProjectsService', ["$http", function($http){
+dockerWatch.factory('ProjectsService', ["$http", "LoginService", function($http, LoginService){
 	return {
 		getProjects: function(userId){
 			return $http({
 				method: 'GET',
-				url: 'api/projects/getProjects/' + userId
+				url: 'api/projects/getProjects',
+				headers: {
+					Authorization: 'Bearer '+ LoginService.getToken()
+				}
 			})
 			.success(function(res){
 				console.log('Successfully retrieved projects:', res)

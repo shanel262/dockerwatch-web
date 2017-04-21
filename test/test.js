@@ -165,4 +165,79 @@ describe('Projects API', function(){
 			})
 		})
 	})
+
+	describe('Get all projects for user id', function(){
+		it('should succeed with legit user jwt token', function(done){
+			chai.request(app)
+			.get('/api/projects/getProjects')
+			.set('Authorization', 'Bearer ' + userToken)
+			.end(function(err, res){
+				expect(err).to.be.null
+				expect(res.body.length).to.equal(1)
+				expect(res.status).to.equal(200)
+				done()
+			})
+		})
+
+		it('should receive error with illegitimate user jwt token', function(done){
+			chai.request(app)
+			.get('/api/projects/getProjects')
+			.set('Authorization', 'Bearer ' + null)
+			.end(function(err, res){
+				expect(err).to.not.be.null
+				expect(res.body.length).to.equal(undefined)
+				expect(res.status).to.equal(500)
+				done()
+			})
+		})
+	})
+
+	describe('Get a single project', function(){
+		var existingProject = {
+			"_id" : mongoose.Types.ObjectId("58f7b54c1c5d645c84c749b7"), 
+			"name" : "Docker", 
+			"owner" : "shanel262", 
+			"team" : [ { "_id" : "58ee83d920f47b5f12ab614f", "permission" : false } ], 
+			"containers" : "2fd;098"
+		}
+
+		before(function(done){
+			mongoose.connection.collection('projects').insert(existingProject)
+			done()
+		})
+
+		it('should return a project using an existing project id', function(done){
+			chai.request(app)
+			.get('/api/projects/' + existingProject._id)
+			.set('Authorization', 'Bearer ' + null)
+			.end(function(err, res){
+				expect(err).to.be.null
+				expect(res.status).to.equal(200)
+				expect(res.body.name).to.equal('Docker')
+				done()
+			})
+		})
+
+		it('should not return a project with an non-existent project id', function(done){
+			chai.request(app)
+			.get('/api/projects/' + "58f7b54c1000045c84c749b7")
+			.set('Authorization', 'Bearer ' + null)
+			.end(function(err, res){
+				expect(err).to.not.be.null
+				expect(res.status).to.equal(404)
+				done()
+			})
+		})
+
+		it('should not return a project with an incorrect project id (no id or incorrect length)', function(done){
+			chai.request(app)
+			.get('/api/projects/' + "58f7b54c145c84c749b7")
+			.set('Authorization', 'Bearer ' + null)
+			.end(function(err, res){
+				expect(err).to.not.be.null
+				expect(res.status).to.equal(400)
+				done()
+			})
+		})
+	})
 })

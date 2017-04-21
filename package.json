@@ -5,12 +5,13 @@
   "main": "app.js",
   "scripts": {
     "test": "mocha test/test.js",
-    "start": "node app.js"
+    "start": "node app.js",
+    "coverage": "istanbul cover _mocha test/test.js"
   },
   "author": "Shane Lacey",
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "0.8.7",
+    "bcrypt": "^1.0.2",
     "body-parser": "1.0.x",
     "cookie-parser": "1.0.x",
     "debug": "0.7.x",
@@ -33,6 +34,7 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "chai-http": "^3.0.0",
+    "istanbul": "^0.4.5",
     "mocha": "^3.2.0"
   }
 }

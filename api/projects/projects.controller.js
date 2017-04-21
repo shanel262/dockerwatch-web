@@ -9,8 +9,10 @@ function handleError(res, err) {
 }
 
 exports.getProjects = function(req, res){
-	console.log('AT getProjects API:', req.params.userId)
-	Project.find({'team._id': req.params.userId}, function(err, projects){
+	var token = req.headers.authorization.substring(11)
+	var decoded = jwt.decode(token, 'MY_SECRET');
+	// console.log('AT getProjects API:', decoded._id)
+	Project.find({'team._id': decoded._id}, function(err, projects){
 		if(err){return handleError(err)}
 		else{
 			console.log('Found projects:', projects)
@@ -21,7 +23,7 @@ exports.getProjects = function(req, res){
 
 exports.newProject = function(req, res){
 	console.log('AT newProject API:', req.body)
-	var token = req.headers.authorization.substring(11) //.token.substring(4)
+	var token = req.headers.authorization.substring(11)
 	var decoded = jwt.decode(token, 'MY_SECRET');
 	req.sanitize('name').escape()
 	var project = {
@@ -37,6 +39,7 @@ exports.newProject = function(req, res){
 }
 
 exports.getSingleProject = function(req, res){
+	// console.log('Params:', req.params)
 	if(req.params.id && req.params.id.length == 24){
 		Project.findById(req.params.id, function(err, project){
 			if(err){handleError(err)}

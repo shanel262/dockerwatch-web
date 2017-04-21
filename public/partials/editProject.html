@@ -7,11 +7,11 @@
 					<b>Edit project</b>
 				</div>
 				<div class="panel-body">
-					<form ng-submit="saveProject()">
+					<form ng-submit="saveProject(newName)">
 						<div class="form-group">
 							<label>Name:</label> 
 							<br>
-							<input type="text" name="name" placeholder="Name" ng-model="name">
+							<input type="text" name="name" placeholder="Name" ng-model="newName">
 						</div>
 						<button type="submit" class="btn btn-success">Submit</button>
 					</form>

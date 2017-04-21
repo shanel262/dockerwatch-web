@@ -259,8 +259,15 @@ dockerWatch.factory('NewProjectsService', ["$http", "$location", "LoginService",
 }])
 
 //Single project
-dockerWatch.controller('SingleProjectController', ["$scope", "SingleProjectService", "$routeParams", "$http", "$timeout", "$location", "$window", "$route", "$rootScope", function($scope, SingleProjectService, $routeParams, $http, $timeout, $location, $window, $route, $rootScope){
-	$http.get('/api/projects/' + $routeParams.projectID).success(function(project){
+dockerWatch.controller('SingleProjectController', ["$scope", "SingleProjectService", "$routeParams", "$http", "$timeout", "$location", "$window", "$route", "$rootScope", "LoginService", function($scope, SingleProjectService, $routeParams, $http, $timeout, $location, $window, $route, $rootScope, LoginService){
+	$http({
+		method: 'GET',
+		url: '/api/projects/' + $routeParams.projectID,
+		headers: {
+			Authorization: 'Bearer '+ LoginService.getToken()
+		}
+	})
+	.success(function(project){
 		console.log('RESPONSE1:', project)
 		var utcTime = dateFromObjectID(project._id)
 		$scope.utcTime = utcTime
@@ -297,14 +304,15 @@ dockerWatch.controller('SingleProjectController', ["$scope", "SingleProjectServi
 		$location.path('/projects')
 	})
 
-	$scope.saveProject = function(){
+	$scope.saveProject = function(newName){
 		var newInfo = {
 			id: $scope.id,
-			name: $scope.name,
+			name: newName,
 			owner: $scope.owner,
 			conIds: $scope.containerString,
 			time: $scope.utcTime
 		}
+		console.log('EDITING PROJECT:', newInfo, newName)
 		save(newInfo)
 		$location.path('/project/' + $scope.id)
 	}
@@ -375,9 +383,17 @@ dockerWatch.controller('SingleProjectController', ["$scope", "SingleProjectServi
 	}
 }])
 
-dockerWatch.factory('SingleProjectService', ["$http", function($http){
+dockerWatch.factory('SingleProjectService', ["$http", "LoginService", function($http, LoginService){
 	save = function(newInfo){
-		$http.post('/api/projects/editProject', newInfo).then(function(res){
+		$http({
+			method: 'POST',
+			url: '/api/projects/editProject',
+			headers: {
+				Authorization: 'Bearer '+ LoginService.getToken()
+			},
+			data: newInfo
+		})
+		.then(function(res){
 			console.log('RESPONSE:', res)
 		})
 	}
@@ -526,7 +542,7 @@ dockerWatch.factory('AddUserToProjectService', ["$http", function($http){
 }])
 
 //Single Container View
-dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerService", "$route", "$timeout", "$routeParams", "$http", "$window", "$location", "$rootScope", function($scope, SingleContainerService, $route, $timeout, $routeParams, $http, $window, $location, $rootScope){
+dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerService", "$route", "$timeout", "$routeParams", "$http", "$window", "$location", "$rootScope", "LoginService", function($scope, SingleContainerService, $route, $timeout, $routeParams, $http, $window, $location, $rootScope, LoginService){
 	var split = $routeParams.containerID.split('.')
 	var projectId = split[0]
 	var containerId = split[1]
@@ -932,7 +948,14 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 		}
 	}
 
-	$http.get('/api/projects/' + projectId).success(function(project){
+	$http({
+		method: 'GET',
+		url: '/api/projects/' + projectId,
+		headers: {
+			Authorization: 'Bearer '+ LoginService.getToken()
+		}
+	})
+	.success(function(project){
 		console.log('RESPONSE1:', project)
 		var utcTime = dateFromObjectID(project._id)
 		$scope.utcTime = utcTime
@@ -1006,9 +1029,17 @@ dockerWatch.controller('SingleContainerController', ["$scope", "SingleContainerS
 	}
 }])
 
-dockerWatch.factory('SingleContainerService', ["$location", "$http", function($location, $http){
+dockerWatch.factory('SingleContainerService', ["$location", "$http", "LoginService", function($location, $http, LoginService){
 	save = function(newInfo){
-		$http.post('/api/projects/editProject', newInfo).then(function(res){
+		$http({
+			method: 'POST',
+			url: '/api/projects/editProject',
+			headers: {
+				Authorization: 'Bearer '+ LoginService.getToken()
+			},
+			data: newInfo
+		})
+		.then(function(res){
 			console.log('RESPONSE:', res)
 		})
 	}

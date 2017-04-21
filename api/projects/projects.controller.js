@@ -40,6 +40,8 @@ exports.newProject = function(req, res){
 
 exports.getSingleProject = function(req, res){
 	// console.log('Params:', req.params)
+	var token = req.headers.authorization.substring(11)
+	var decoded = jwt.decode(token, 'MY_SECRET');
 	if(req.params.id && req.params.id.length == 24){
 		Project.findById(req.params.id, function(err, project){
 			if(err){handleError(err)}
@@ -55,17 +57,24 @@ exports.getSingleProject = function(req, res){
 }
 
 exports.editProject = function(req, res){
+	// console.log('AT editProject API:', req.body)
+	var token = req.headers.authorization.substring(11)
+	var decoded = jwt.decode(token, 'MY_SECRET');
 	req.sanitize('name').escape()
 	req.sanitize('conIds').escape()
 	Project.findById(req.body.id, function(err, project){
-		if(err){handleError(err)}
-		project.name = req.body.name
-		project.containers = req.body.conIds
-		project.save(function(err){
-			if(err){handleError(err)}
-			console.log('Update successful:', project)
-			return res.json(200, project)
-		})
+		if(err){handleError(res, err)}
+		else{
+			project.name = req.body.name
+			project.containers = req.body.conIds
+			project.save(function(err){
+				if(err){handleError(res, err)}
+				else{
+					console.log('Update successful:', project)
+					return res.status(200).json(project)				
+				}
+			})			
+		}
 	})
 }
 

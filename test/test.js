@@ -31,6 +31,14 @@ var newUser = {
 	"password" : "password"
 }
 
+var existingProject = {
+	"_id" : mongoose.Types.ObjectId("58f7b54c1c5d645c84c749b7"), 
+	"name" : "Docker", 
+	"owner" : "shanel262", 
+	"team" : [ { "_id" : "58ee83d920f47b5f12ab614f", "permission" : false } ], 
+	"containers" : "2fd;098"
+}
+
 var userToken = null
 
 describe('Users', function(){
@@ -193,14 +201,6 @@ describe('Projects API', function(){
 	})
 
 	describe('Get a single project', function(){
-		var existingProject = {
-			"_id" : mongoose.Types.ObjectId("58f7b54c1c5d645c84c749b7"), 
-			"name" : "Docker", 
-			"owner" : "shanel262", 
-			"team" : [ { "_id" : "58ee83d920f47b5f12ab614f", "permission" : false } ], 
-			"containers" : "2fd;098"
-		}
-
 		before(function(done){
 			mongoose.connection.collection('projects').insert(existingProject)
 			done()
@@ -209,7 +209,7 @@ describe('Projects API', function(){
 		it('should return a project using an existing project id', function(done){
 			chai.request(app)
 			.get('/api/projects/' + existingProject._id)
-			.set('Authorization', 'Bearer ' + null)
+			.set('Authorization', 'Bearer ' + userToken)
 			.end(function(err, res){
 				expect(err).to.be.null
 				expect(res.status).to.equal(200)
@@ -221,7 +221,7 @@ describe('Projects API', function(){
 		it('should not return a project with an non-existent project id', function(done){
 			chai.request(app)
 			.get('/api/projects/' + "58f7b54c1000045c84c749b7")
-			.set('Authorization', 'Bearer ' + null)
+			.set('Authorization', 'Bearer ' + userToken)
 			.end(function(err, res){
 				expect(err).to.not.be.null
 				expect(res.status).to.equal(404)
@@ -232,10 +232,85 @@ describe('Projects API', function(){
 		it('should not return a project with an incorrect project id (no id or incorrect length)', function(done){
 			chai.request(app)
 			.get('/api/projects/' + "58f7b54c145c84c749b7")
-			.set('Authorization', 'Bearer ' + null)
+			.set('Authorization', 'Bearer ' + userToken)
 			.end(function(err, res){
 				expect(err).to.not.be.null
 				expect(res.status).to.equal(400)
+				done()
+			})
+		})
+	})
+
+	describe('Edit project', function(){
+		it('should successfully change the name with legit project id', function(done){
+			var editProject = {
+				name: 'Replace Docker',
+				id: existingProject._id,
+				conIds: existingProject.containers
+			}
+			chai.request(app)
+			.post('/api/projects/editProject')
+			.set('Authorization', 'Bearer ' + userToken)
+			.send(editProject)
+			.end(function(err, res){
+				expect(err).to.be.null
+				expect(res.status).to.equal(200)
+				expect(res.body.name).to.equal('Replace Docker')
+				done()
+			})
+		})
+
+		it('should fail with a fake project id', function(done){
+			var editProject = {
+				name: 'Replace Docker',
+				id: '0si93ur9j30j3jjd093jd3',
+				conIds: existingProject.containers
+			}
+			chai.request(app)
+			.post('/api/projects/editProject')
+			.set('Authorization', 'Bearer ' + userToken)
+			.send(editProject)
+			.end(function(err, res){
+				expect(err).to.not.be.null
+				expect(res.status).to.equal(500)
+				done()
+			})
+		})
+	})
+
+	describe('Adding a container', function(done){
+		it('should successfully add a container with legit project id', function(done){
+			var editProject = {
+				name: existingProject.name,
+				id: existingProject._id,
+				conIds: existingProject.containers + ';dockerId'
+			}
+			chai.request(app)
+			.post('/api/projects/editProject')
+			.set('Authorization', 'Bearer ' + userToken)
+			.send(editProject)
+			.end(function(err, res){
+				expect(err).to.be.null
+				expect(res.status).to.equal(200)
+				var cons = res.body.containers.split(';')
+				expect(cons[2]).to.equal('dockerId')
+				done()
+			})
+		})
+
+		it('should fail with a fake project id', function(done){
+			var editProject = {
+				name: 'Docker',
+				id: '0si93ur9j30j3jjd093jd3',
+				conIds: existingProject.containers + ';dockerId'
+			}
+			chai.request(app)
+			.post('/api/projects/editProject')
+			.set('Authorization', 'Bearer ' + userToken)
+			.send(editProject)
+			.end(function(err, res){
+				expect(err).to.not.be.null
+				expect(res.status).to.equal(500)
 				done()
 			})
 		})

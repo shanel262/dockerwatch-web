@@ -498,6 +498,7 @@ describe('Projects API', function(){
 			.set('Authorization', 'Bearer ' + userToken)
 			.send(changePerm)
 			.end(function(err, res){
+				console.log('ERR501:', err, res.body)
 				expect(err).to.not.be.null
 				expect(res.status).to.equal(400)
 				expect(res.body.nModified).to.equal(0)
@@ -551,6 +552,7 @@ describe('Projects API', function(){
 			.set('Authorization', 'Bearer ' + userToken)
 			.send(user)
 			.end(function(err, res){
+				console.log('ERR555:', err, res.body)
 				expect(err).to.not.be.null
 				expect(res.status).to.equal(400)
 				expect(res.body.nModified).to.equal(0)

@@ -85,7 +85,7 @@ exports.deleteProject = function(req, res){
 		Project.remove({_id: req.params.id}, function(err, project){
 			if(err){handleError(res, err)}
 			else if(project.result.n == 1){
-				console.log('Project removed:', project)
+				// console.log('Project removed:', project)
 				return res.status(200).json(project)
 			}
 			else{

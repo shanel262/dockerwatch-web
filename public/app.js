@@ -400,7 +400,14 @@ dockerWatch.factory('SingleProjectService', ["$http", "LoginService", function($
 
 	deletePro = function(info){
 		console.log('PROJECTID:', info.id)
-		$http.delete('/api/projects/deleteProject/' + info.id).then(function(res){
+		$http({
+			method: 'DELETE',
+			url: '/api/projects/deleteProject/' + info.id,
+			headers: {
+				Authorization: 'Bearer '+ LoginService.getToken()
+			}
+		})
+		.then(function(res){
 			console.log('RESPONSE:', res)
 		})
 	}
@@ -449,7 +456,6 @@ dockerWatch.controller('AddUserToProjectController', ["$scope", "AddUserToProjec
 	})
 
 	$scope.addUser = function(){
-		console.log('ADD USER:', $scope.add, $scope.write)
 		var users = []
 		Object.keys($scope.add).forEach(function(key){
 			if($scope.add[key] == true){
@@ -496,11 +502,14 @@ dockerWatch.controller('AddUserToProjectController', ["$scope", "AddUserToProjec
 	}
 }])
 
-dockerWatch.factory('AddUserToProjectService', ["$http", function($http){
+dockerWatch.factory('AddUserToProjectService', ["$http", "LoginService", function($http, LoginService){
 	addUser = function(users){
 		$http({
 			method: 'POST',
 			url: '/api/projects/addUsers',
+			headers: {
+				Authorization: 'Bearer '+ LoginService.getToken()
+			},
 			data: users
 		})
 		.success(function(res){
@@ -515,6 +524,9 @@ dockerWatch.factory('AddUserToProjectService', ["$http", function($http){
 		$http({
 			method: 'POST',
 			url: '/api/projects/deleteUser',
+			headers: {
+				Authorization: 'Bearer '+ LoginService.getToken()
+			},
 			data: user
 		})
 		.success(function(res){
@@ -529,6 +541,9 @@ dockerWatch.factory('AddUserToProjectService', ["$http", function($http){
 		$http({
 			method: 'POST',
 			url: '/api/projects/changePerm',
+			headers: {
+				Authorization: 'Bearer '+ LoginService.getToken()
+			},
 			data: projAndPerm
 		})
 		.success(function(res){

@@ -28,31 +28,6 @@ exports.register = function(req, res){
 	}
 }
 
-// exports.login = function(req, res){
-//   User.findOne({
-//     username: req.body.username
-//   }, function(err, user) {
-//     if (err) throw err;
- 
-//     if (!user) {
-//       res.status(401).json({success: false, msg: 'Authentication failed. User not found.'});
-//     } else {
-// 	      user.comparePassword(req.body.password, function (err, isMatch) {
-// 	        if (isMatch && !err) {
-// 	          var expiry = new Date();
-// 			  expiry.setDate(expiry.getDate() + 7);
-// 	          user.exp = parseInt(expiry.getTime() / 1000)
-// 	          console.log('USER:', user)
-// 	          var token = jwt.encode(user, "MY_SECRET");
-// 	          res.status(200).json({success: true, token: 'JWT ' + token});
-// 	        } else {
-// 	          res.status(401).json({success: false, msg: 'Authentication failed. Wrong password.'});
-// 	        }
-//       });
-//     }
-// })
-// };
-
 exports.login = function(req, res){
 	User.findOne({username: req.body.username}, function(err, user){
 		if(err){handleError(res, err)}

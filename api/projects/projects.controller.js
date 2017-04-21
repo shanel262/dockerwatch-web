@@ -79,23 +79,28 @@ exports.editProject = function(req, res){
 }
 
 exports.deleteProject = function(req, res){
+	var token = req.headers.authorization.substring(11)
+	var decoded = jwt.decode(token, 'MY_SECRET');
 	if(req.params.id != "undefined"){
-		Project.findById(req.params.id, function(err, response){
-			if(err){handleError(err)}
-			response.remove()
-			response.save(function(err){
-				if(err){handleError(err)}
-				console.log('Project removed', req.params.id)
-				return res.json(410, response)
-			})
+		Project.remove({_id: req.params.id}, function(err, project){
+			if(err){handleError(res, err)}
+			else if(project.result.n == 1){
+				console.log('Project removed:', project)
+				return res.status(200).json(project)
+			}
+			else{
+				return res.status(400).json(project)
+			}
 		})
 	}
-	else{return res.json(400, "No project ID provided")}
+	else{return res.status(400).send("No project ID provided")}
 	
 }
 
 exports.addUsers = function(req, res){
 	console.log('AT addUsers API:', req.body)
+	var token = req.headers.authorization.substring(11)
+	var decoded = jwt.decode(token, 'MY_SECRET');
 	var projectId = req.body.pop()
 	Project.findById(projectId.id, function(err, project){
 		if(err){handleError(res, err)}
@@ -113,7 +118,7 @@ exports.addUsers = function(req, res){
 						if(err){handleError(res, err)}
 						else{
 							console.log('Users added')
-							return res.send(200).json(project)
+							return res.status(200).json(project)
 						}
 					})
 				}
@@ -124,9 +129,14 @@ exports.addUsers = function(req, res){
 
 exports.deleteUser = function(req, res){
 	console.log('AT deleteUser API:', req.body)
+	var token = req.headers.authorization.substring(11)
+	var decoded = jwt.decode(token, 'MY_SECRET');
 	Project.update({_id: req.body.projectId}, {$pull: {team: {_id: req.body._id}}}, {safe: true},
 		function(err, project){
 			if(err){handleError(res, err)}
+			else if(project.nModified == 0){
+				return res.status(400).json(project)
+			}
 			else{
 				console.log('Removed user:', project)
 				return res.status(200).json(project)
@@ -137,10 +147,15 @@ exports.deleteUser = function(req, res){
 
 exports.changePerm = function(req, res){
 	console.log('AT changePerm API:', req.body)
+	var token = req.headers.authorization.substring(11)
+	var decoded = jwt.decode(token, 'MY_SECRET');
 	Project.update({_id: req.body.projectId, 'team._id': req.body.userId}, 
 		{$set: {'team.$.permission': req.body.permission}}, 
 		function(err, project){
 			if(err){handleError(res, err)}
+			else if(project.nModified == 0){
+				return res.status(400).json(project)
+			}
 			else{
 				console.log('Updated permission:', project)
 				return res.status(200).json(project)

@@ -10,13 +10,15 @@ Dockerwatch-web is the frontend for the project, displaying projects and contain
 3. Run ```npm install``` in the root directory
 4. Run ```npm start``` to start the service on port 4000
 
+**To add a container to a project, it must first exist in InfluxDB (start dockerwatch-stats first to ensure it will exist)**
+
 ## How to run tests
-1. If MongoDB are not accessible through localhost then insert the IP address in the config.yml file
+1. If MongoDB is not accessible through localhost then insert the IP address in the config.yml file
 2. Run ```npm install``` in the root directory
 3. Run ```npm test```
 
 ## How to see the test coverage
-1. If MongoDB are not accessible through localhost then insert the IP address in the config.yml file
+1. If MongoDB is not accessible through localhost then insert the IP address in the config.yml file
 2. Run ```npm install``` in the root directory
 3. Run ```npm run coverage```
 4. The coverage report is produced in a directory called coverage in the root folder. Open the index.html file in your browser

@@ -34,3 +34,5 @@ The name of the database is located in the /api/stats/ directory in a file calle
 ```
 database: 'dockerwatch'
 ```
+
+MIT © [Shane Lacey](https://github.com/shanel262/dockerwatch-web/blob/master/license)

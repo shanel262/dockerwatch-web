@@ -1,9 +1,9 @@
 <div class="container-fluid" ng-controller="SingleContainerController">
 	<div class="row">
 		<div class="col-md-4">
-			<div class="panel panel-primary">
-				<div class="panel-heading">
-					<a class="btn btn-sm btn-default" href="#/project/{{id}}">Back</a> <b>Project Information</b>
+			<div class="panel panel-default">
+				<div class="panel-heading" style="text-align: center; background-color: #34495e; color: white">
+					<a class="btn btn-xs btn-default pull-left" href="#/project/{{id}}">Back</a> <b>Project Information</b>
 				</div>
 				<div class="panel-body">
 					ID: <b>{{id}}</b><br>
@@ -12,8 +12,8 @@
 					Created at: <b>{{projectDate}}</b>
 				</div>
 			</div>
-			<div class="panel panel-primary">
-				<div class="panel-heading">
+			<div class="panel panel-default">
+				<div class="panel-heading" style="text-align: center; background-color: #34495e; color: white">
 					<b>Container Information</b>
 				</div>
 				<div class="panel-body">
@@ -36,26 +36,20 @@
 					</p>
 				</div>
 			</div>
-			<div class="panel panel-primary">
-				<div class="panel-heading"><b>Other Containers</b></div>
+			<div class="panel panel-default">
+				<div class="panel-heading" style="text-align: center; background-color: #34495e; color: white"><b>Other Containers</b></div>
 				<div class="panel-body">
-					<div class="panel panel-success" ng-repeat="container in containers" ng-hide="areSame(container, containerId)"> <!--NEVER APPLY A FILTER TO THIS $INDEX WILL CAUSE A BUG-->
+					<div class="panel panel-default" ng-repeat="container in containers" ng-hide="areSame(container, containerId)"> <!--NEVER APPLY A FILTER TO THIS $INDEX WILL CAUSE A BUG-->
 						<div class="panel-heading"><a href="#/container/{{projectContainerConcat[$index]}}">Container ID: {{container}}</a></div>
-						<div class="panel-body">
-							<ul>
-								<li>Stats</li>
-							</ul>
-						</div>
 					</div>
 				</div>						
 			</div>
 		</div>
 		<div class="col-md-8">
-			<div class="panel panel-primary">
-				<div class="panel-heading"><b>Container ID: {{containerId}}  </b><a ng-click="deleteContainer()" class="btn btn-danger btn-sm" ng-if="permission == true">Delete</a></div>
-				<div class="panel-body">
-					<div class="dropdown" style="padding-bottom: 5px">
-						<button class="btn btn-warning dropdown-toggle" type="button" data-toggle="dropdown">Show Graphs <span class="caret"></span></button>
+			<div class="panel panel-default">
+				<div class="panel-heading" style="text-align: center; background-color: #34495e; color: white">
+					<div class="dropdown" style="color: black">
+						<button class="btn btn-default dropdown-toggle pull-left btn-xs" type="button" data-toggle="dropdown">Show Graphs <span class="caret"></span></button>
 						<ul class="dropdown-menu" style="padding-left: 10px; padding-right: 10px;">
 							<li style="border-bottom: thin solid lightgrey;"><label><input type="checkbox" name="cpu" ng-model="showGraphs.cpu" checked>CPU</label></li>
 							<li style="border-bottom: thin solid lightgrey;"><label><input type="checkbox" name="mem" ng-model="showGraphs.mem" checked>Memory</label></li>
@@ -65,6 +59,11 @@
 							<li><label><input type="checkbox" name="error" ng-model="showGraphs.error" checked>Network Errors</label></li>
 						</ul>
 					</div>
+					<b>Container ID: {{containerId}}  </b>
+					<a ng-click="deleteContainer()" class="btn btn-danger btn-xs pull-right" ng-if="permission == true">Delete</a>
+				</div>
+				<div class="panel-body">
+					
 					<p class="graph-bottom-gap">Received from container at: <b>{{dateTime}}</b>
 					<div class="col-md-12 graph-bottom-gap" ng-show="showGraphs.cpu == true">
 						<p style="padding-top: 10px; text-align: center; font-size: 20px;">

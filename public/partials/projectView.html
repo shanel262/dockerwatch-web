@@ -6,50 +6,36 @@
 		<div class="alert alert-danger" ng-model="status" ng-if="status == 'failure'">
   			<strong>Failure!</strong> Container was not added because it doesn't exist in Influx.
 		</div>
-		<div class="col-md-4">
-			<div class="panel panel-primary">
-				<div class="panel-heading">
-					<b>Project ID: {{id}}</b>
-					<a href="#/edit-project/{{id}}" class="btn btn-success btn-sm" ng-if="loggedInUser.permission == true">Edit</a>
-					<a ng-click="deleteProject()" class="btn btn-danger btn-sm" ng-if="loggedInUser.permission == true">Delete</a>
+		<div class="col-md-8 col-md-offset-2">
+			<div class="panel panel-default">
+				<div class="panel-heading" style="text-align: center; background-color: #34495e; color: white">
+					<b class="panel-title">Project Name: {{name}}</b>
+					<div class="pull-right">
+						<a href="#/edit-project/{{id}}" class="btn btn-success btn-xs" ng-if="loggedInUser.permission == true">Edit</a>
+						<a ng-click="deleteProject()" class="btn btn-danger btn-xs" ng-if="loggedInUser.permission == true">Delete</a>						
+					</div>
 				</div>
-				<div class="panel-body">
-					Name: <b>{{name}}</b><br>
+				<div class="panel-body" style="background-color: #f5f5f0">
+					Id: <b>{{id}}</b><br>
 					Created by: <b>{{owner}}</b><br>
 					Created on: <b>{{time}} - {{date}}</b>
 				</div>
 			</div>
-			<div class="panel panel-primary">
-				<div class="panel-heading"><b>Containers</b>
-					<button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#addCon-modal" ng-if="loggedInUser.permission == true">Add container</button>
+			<div class="panel panel-default">
+				<div class="panel-heading" style="text-align: center; background-color: #34495e; color: white">
+					<b>Containers</b>
+					<button type="button" class="btn btn-success btn-xs pull-right" data-toggle="modal" data-target="#addCon-modal" ng-if="loggedInUser.permission == true">Add container</button>
 				</div>
-				<div class="panel-body">
-					<div class="panel panel-success" ng-repeat="container in containers"> <!--NEVER APPLY A FILTER TO THIS $INDEX WILL CAUSE A BUG-->
-						<div class="panel-heading"><a href="#/container/{{projectContainerConcat[$index]}}">Container ID: {{container}}</a></div>
-						<div class="panel-body">
-							<ul>
-								<li>Stats</li>
-							</ul>
-						</div>
+				<div class="panel-body" style="background-color: #f5f5f0">
+					<input class="form-control input-sm" placeholder="Search" type="text" name="searchContainers" ng-model="searchContainers">
+					<br>
+					<div class="panel panel-default col-md-4" ng-repeat="container in containers | filter:searchContainers"> <!-- containers -->  <!--NEVER APPLY A FILTER TO THIS $INDEX WILL CAUSE A BUG-->
+						<a href="#/container/{{projectContainerConcat[$index]}}"><div class="panel-body">Container ID: {{container}}</div></a>
 					</div>
 				</div>						
 			</div>
 		</div>
-		<div class="col-md-8">
-			<div class="panel panel-primary">
-				<div class="panel-heading"><b>Recently Added</b></div>
-				<div class="panel-body">
-					<div class="panel panel-success" ng-repeat="con in ['098', '2fd']">
-						<div class="panel-heading">Container ID: {{con}}</div>
-						<div class="panel-body">
-							<ul>
-								<li>Some stats</li>
-							</ul>
-						</div>
-					</div>
-				</div>						
-			</div>
-		</div>
+
 
 		<div class="modal fade" id="addCon-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
     		<div class="modal-dialog">

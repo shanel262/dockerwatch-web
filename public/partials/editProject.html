@@ -2,8 +2,8 @@
 	<div class="row" ng-if="loggedInUser.permission == true">
 		<div class="col-md-8 col-md-offset-2">
 			<div class="panel panel-primary">
-				<div class="panel-heading">
-					<a class="btn btn-sm btn-default" href="#/project/{{id}}">Back</a>
+				<div class="panel-heading" style="text-align: center; background-color: #34495e; color: white">
+					<a class="btn btn-xs btn-default pull-left" href="#/project/{{id}}">Back</a>
 					<b>Edit project</b>
 				</div>
 				<div class="panel-body">
@@ -11,7 +11,7 @@
 						<div class="form-group">
 							<label>Name:</label> 
 							<br>
-							<input type="text" name="name" placeholder="Name" ng-model="newName">
+							<input type="text" name="name" placeholder="Name" ng-model="newName" class="form-control">
 						</div>
 						<button type="submit" class="btn btn-success">Submit</button>
 					</form>
@@ -19,7 +19,7 @@
 			</div>
 			<div ng-controller="AddUserToProjectController">
 				<div class="panel panel-primary">
-					<div class="panel-heading"><b>Project Team</b></div>
+					<div class="panel-heading" style="text-align: center; background-color: #34495e; color: white"><b>Project Team</b></div>
 					<div class="panel-body">
 						<input class="form-control" placeholder="Search" type="text" name="searchProjectTeam" ng-model="searchProjectTeam">
 						<br>
@@ -45,7 +45,7 @@
 					</div>						
 				</div>
 				<div class="panel panel-default">
-					<div class="panel-heading"><b>Add User</b></div>
+					<div class="panel-heading" style="text-align: center; background-color: #34495e; color: white"><b>Add User</b></div>
 					<div class="panel-body">
 						<input class="form-control" placeholder="Search" type="text" name="searchAddUser" ng-model="searchAddUser">
 						<br>

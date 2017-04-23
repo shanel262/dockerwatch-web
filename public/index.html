@@ -12,19 +12,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="styles/bootstrap.css">
   <link href="styles/custom.css" rel="stylesheet" type="text/css">
 
 </head>
 <!--Navbar-->
-<nav class="navbar navbar-inverse" ng-controller="NavController">
+<nav class="navbar" ng-controller="NavController" style="background-color: #cccccc">
   <div class="container-fluid">
     <div class="navbar-header">
       <a class="navbar-brand" href="#/">DockerWatch</a>
     </div>
     <div>
       <ul class="nav navbar-nav">
-        <li><a href="#/projects" ng-if="loggedInUser != null">Projects</a></li>
         <li><a href="#/login" ng-if="loggedInUser == null">Login</a></li>
         <li><a href="#/register" ng-if="loggedInUser == null">Register</a></li>
       </ul>

@@ -25,7 +25,7 @@ dockerWatch.config(['$routeProvider',
 			templateUrl: 'partials/container.html'
 		})
 		.otherwise({
-			redirectTo: "/projects"
+			redirectTo: "/login"
 		})
 	}
 ])

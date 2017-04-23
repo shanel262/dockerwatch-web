@@ -1,37 +1,43 @@
 <div class="container-fluid" ng-controller="ProjectsController">
 	<div class="row">
-		<div class="col-md-4">
-			<div class="panel panel-primary">
-				<div class="panel-heading"><b>Projects</b>
-				<button ng-click="newProject()" class="btn btn-success btn-sm">New Project</button>
+		<div class="col-md-8 col-md-offset-2">
+			<div class="panel panel-default">
+				<div class="panel-heading" style="text-align: center; background-color: #34495e; color: white">
+					<b class="panel-title">Projects</b>
+					<div class="btn-group pull-right">
+						<button ng-click="newProject()" class="btn btn-success btn-xs">New Project</button>
+					</div>
 				</div>
 				<div class="panel-body">
-					<div class="panel panel-success" ng-repeat="project in projects">
-						<div class="panel-heading"><a href="#/project/{{project.id}}">Project ID: {{project.id}}</a></div>
-						<div class="panel-body">
-							<ul>
-								<li>Name: {{project.name}}</li>
-								<li>Owner: {{project.owner}}</li>
-								<li>Container IDs: {{project.containers}}</li>
-							</ul>
-						</div>
-					</div>
-				</div>						
-			</div>
-		</div>
-		<div class="col-md-8">
-			<div class="panel panel-primary">
-				<div class="panel-heading"><b>Recently Added</b></div>
-				<div class="panel-body">
-					<div class="panel panel-success" ng-repeat="con in ['098', '2fd']">
-						<div class="panel-heading">Container ID: {{con}}</div>
-						<div class="panel-body">
-							<ul>
-								<li>Some stats</li>
-							</ul>
+					<input class="form-control input-sm" placeholder="Search" type="text" name="searchProjects" ng-model="searchProjects">
+					<br>
+					<div class="panel panel-default" ng-repeat="project in projects | filter:searchProjects">
+						<div class="panel-heading" style="background-color: #cccccc"><a href="#/project/{{project.id}}">Project Name: {{project.name}}</a></div>
+						<div class="panel-body" style="background-color: #f5f5f0">
+							<table class="table table-bordered table-striped table-condensed">
+								<thead style="background-color: #34495e; color: white">
+									<tr>
+										<td>Id</td>
+										<td>Owner</td>
+										<td>Containers</td>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>{{project.id}}</td>
+										<td>{{project.owner}}</td>
+										<td>
+											<ul>
+												<li ng-repeat="container in project.containers">{{container}}</li>
+											</ul>
+										</td>
+									</tr>
+								</tbody>
+							</table>
 						</div>
 					</div>
 				</div>						
 			</div>
 		</div>
 	</div>
+</div>
